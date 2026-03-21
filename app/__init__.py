@@ -46,4 +46,9 @@ def create_app():
     app.register_blueprint(customers_bp, url_prefix='/admin/clientes')
     app.register_blueprint(config_bp, url_prefix='/admin/configuracion')
 
+    # Crear tablas automáticamente si no existen (primer deploy)
+    with app.app_context():
+        from app.models import Product, Customer, Sale, Setting  # noqa: F401
+        db.create_all()
+
     return app
