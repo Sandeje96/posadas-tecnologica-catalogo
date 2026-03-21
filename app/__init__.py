@@ -50,5 +50,14 @@ def create_app():
     with app.app_context():
         from app.models import Product, Customer, Sale, Setting  # noqa: F401
         db.create_all()
+        # Agregar columnas nuevas si la tabla ya existía (migración manual)
+        try:
+            from sqlalchemy import text
+            with db.engine.connect() as conn:
+                for col, tipo in [('ram', 'VARCHAR(50)'), ('storage', 'VARCHAR(50)'), ('color', 'VARCHAR(50)')]:
+                    conn.execute(text(f'ALTER TABLE products ADD COLUMN IF NOT EXISTS {col} {tipo}'))
+                conn.commit()
+        except Exception:
+            pass
 
     return app

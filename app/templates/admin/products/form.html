@@ -65,6 +65,43 @@
                                       style="border-color: var(--color-border);">{{ product.description if product else '' }}</textarea>
                         </div>
 
+                        <!-- Características Smartphone -->
+                        <div class="mt-3 p-3 rounded-3" style="background-color: var(--color-surface); border: 1px solid var(--color-border);">
+                            <p class="fw-semibold small mb-3" style="color: var(--color-primary);">
+                                <i class="bi bi-phone me-1" style="color: var(--color-accent);"></i>
+                                Características del Smartphone
+                            </p>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-medium small" style="color: var(--color-text);">
+                                        <i class="bi bi-memory me-1" style="color: var(--color-accent);"></i>Memoria RAM
+                                    </label>
+                                    <input type="text" class="form-control form-control-sm" name="ram"
+                                           value="{{ product.ram if product and product.ram else '' }}"
+                                           placeholder="Ej: 8 GB"
+                                           style="border-color: var(--color-border);">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-medium small" style="color: var(--color-text);">
+                                        <i class="bi bi-device-hdd me-1" style="color: var(--color-accent);"></i>Almacenamiento
+                                    </label>
+                                    <input type="text" class="form-control form-control-sm" name="storage"
+                                           value="{{ product.storage if product and product.storage else '' }}"
+                                           placeholder="Ej: 256 GB"
+                                           style="border-color: var(--color-border);">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-medium small" style="color: var(--color-text);">
+                                        <i class="bi bi-palette me-1" style="color: var(--color-accent);"></i>Color
+                                    </label>
+                                    <input type="text" class="form-control form-control-sm" name="color"
+                                           value="{{ product.color if product and product.color else '' }}"
+                                           placeholder="Ej: Negro"
+                                           style="border-color: var(--color-border);">
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="row g-3 mt-0">
                             <div class="col-md-6">
                                 <label class="form-label fw-medium" style="color: var(--color-text);">Categoría</label>

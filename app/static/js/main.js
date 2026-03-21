@@ -159,7 +159,14 @@ function openProductModal(productId) {
             <h4 class="fw-bold mb-1" style="color: var(--color-text);">${data.name}</h4>
             <p class="mb-3" style="color: var(--color-muted);">${data.brand}${data.model ? ' · ' + data.model : ''}</p>
 
-            ${data.description ? `<p class="mb-4 small" style="color: var(--color-text);">${data.description}</p>` : ''}
+            ${data.description ? `<p class="mb-3 small" style="color: var(--color-text);">${data.description}</p>` : ''}
+
+            ${(data.ram || data.storage || data.color) ? `
+            <div class="d-flex flex-wrap gap-2 mb-3">
+              ${data.ram ? `<span class="badge rounded-pill px-3 py-2" style="background-color: rgba(10,46,92,0.08); color: var(--color-primary); font-size: 0.8rem;"><i class="bi bi-memory me-1"></i><strong>RAM:</strong> ${data.ram}</span>` : ''}
+              ${data.storage ? `<span class="badge rounded-pill px-3 py-2" style="background-color: rgba(10,46,92,0.08); color: var(--color-primary); font-size: 0.8rem;"><i class="bi bi-device-hdd me-1"></i><strong>Almacenamiento:</strong> ${data.storage}</span>` : ''}
+              ${data.color ? `<span class="badge rounded-pill px-3 py-2" style="background-color: rgba(10,46,92,0.08); color: var(--color-primary); font-size: 0.8rem;"><i class="bi bi-palette me-1"></i><strong>Color:</strong> ${data.color}</span>` : ''}
+            </div>` : ''}
 
             <div class="mb-3">
               <div class="fw-bold mb-1" style="color: var(--color-accent-alt); font-size: 1.6rem;">

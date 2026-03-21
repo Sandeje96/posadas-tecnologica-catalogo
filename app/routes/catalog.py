@@ -77,7 +77,10 @@ def product_detail(product_id):
         'stock': product.stock,
         'badge': product.badge,
         'image_filename': product.image_filename,
-        'exchange_rate': float(exchange_rate)
+        'exchange_rate': float(exchange_rate),
+        'ram': product.ram,
+        'storage': product.storage,
+        'color': product.color
     })
 
 

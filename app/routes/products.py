@@ -96,6 +96,9 @@ def new_product():
             cost_price_usd = Decimal(request.form.get('cost_price_usd', '0') or '0')
             sale_price_usd = Decimal(request.form.get('sale_price_usd', '0') or '0')
             stock = request.form.get('stock') == 'on'
+            ram = request.form.get('ram', '').strip() or None
+            storage = request.form.get('storage', '').strip() or None
+            color = request.form.get('color', '').strip() or None
 
             if not name:
                 flash('El nombre del producto es obligatorio.', 'danger')
@@ -116,7 +119,10 @@ def new_product():
                 cost_price_usd=cost_price_usd,
                 sale_price_usd=sale_price_usd,
                 stock=stock,
-                image_filename=image_filename
+                image_filename=image_filename,
+                ram=ram,
+                storage=storage,
+                color=color
             )
             db.session.add(product)
             db.session.commit()
@@ -147,6 +153,9 @@ def edit_product(product_id):
             product.cost_price_usd = Decimal(request.form.get('cost_price_usd', '0') or '0')
             product.sale_price_usd = Decimal(request.form.get('sale_price_usd', '0') or '0')
             product.stock = request.form.get('stock') == 'on'
+            product.ram = request.form.get('ram', '').strip() or None
+            product.storage = request.form.get('storage', '').strip() or None
+            product.color = request.form.get('color', '').strip() or None
 
             if not product.name:
                 flash('El nombre del producto es obligatorio.', 'danger')
