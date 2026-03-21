@@ -7,8 +7,7 @@ catalog_bp = Blueprint('catalog', __name__)
 CATEGORIES = ['Smartphones', 'Impresoras', 'Tablets', 'Laptops', 'Accesorios']
 
 
-@catalog_bp.route('/')
-def index():
+def _render_catalog(public_view=False):
     categoria = request.args.get('categoria', '')
     buscar = request.args.get('buscar', '')
 
@@ -30,13 +29,11 @@ def index():
 
     products = query.order_by(Product.created_at.desc()).all()
 
-    # Get exchange rate
     try:
         exchange_rate = Decimal(Setting.get('exchange_rate', '1000'))
     except Exception:
         exchange_rate = Decimal('1000')
 
-    # Calculate ARS prices for each product
     products_with_ars = []
     for product in products:
         ars_price = product.sale_price_ars(exchange_rate)
@@ -51,8 +48,20 @@ def index():
         categories=CATEGORIES,
         selected_category=categoria,
         search_query=buscar,
-        exchange_rate=exchange_rate
+        exchange_rate=exchange_rate,
+        public_view=public_view
     )
+
+
+@catalog_bp.route('/')
+def index():
+    return _render_catalog(public_view=False)
+
+
+@catalog_bp.route('/catalogo')
+def public_catalog():
+    """Vista pública del catálogo — sin links de admin."""
+    return _render_catalog(public_view=True)
 
 
 @catalog_bp.route('/producto/<int:product_id>')
