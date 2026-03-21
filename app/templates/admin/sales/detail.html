@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Venta #{{ sale.id }} — PosadasTecnologica Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="{{ url_for('sales.list_sales') }}" class="btn btn-sm" style="color: var(--color-primary); background-color: var(--color-surface); border: 1px solid var(--color-border);">
+            <i class="bi bi-arrow-left me-1"></i>Volver
+        </a>
+        <h2 class="fw-bold mb-0" style="color: var(--color-text);">
+            <i class="bi bi-receipt me-2" style="color: var(--color-accent);"></i>Venta #{{ sale.id }}
+        </h2>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-7">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <h6 class="fw-semibold mb-4" style="color: var(--color-muted); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em;">
+                        Detalle de la Venta
+                    </h6>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="small" style="color: var(--color-muted);">Fecha</div>
+                            <div class="fw-medium" style="color: var(--color-text);">{{ sale.created_at.strftime('%d/%m/%Y %H:%M') }}</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="small" style="color: var(--color-muted);">Producto</div>
+                            <div class="fw-medium" style="color: var(--color-text);">{{ sale.product.name if sale.product else 'N/A' }}</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="small" style="color: var(--color-muted);">Cliente</div>
+                            <div class="fw-medium" style="color: var(--color-text);">{{ sale.customer.name if sale.customer else 'Sin cliente' }}</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="small" style="color: var(--color-muted);">Tipo de cambio</div>
+                            <div class="fw-medium" style="color: var(--color-text);">ARS ${{ '{:,.2f}'.format(sale.exchange_rate) }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="card border-0 shadow-sm rounded-4" style="background: linear-gradient(135deg, var(--color-primary), #1a4a8a);">
+                <div class="card-body p-4 text-white">
+                    <h6 class="fw-semibold mb-4 text-white-50" style="text-transform: uppercase; font-size: 0.8rem;">Resumen Financiero</h6>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-white-50 small">Costo:</span>
+                        <span class="fw-medium">USD ${{ '{:,.2f}'.format(sale.cost_price_usd) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-white-50 small">Venta USD:</span>
+                        <span class="fw-bold" style="color: var(--color-accent);">USD ${{ '{:,.2f}'.format(sale.sale_price_usd) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-white-50 small">Venta ARS:</span>
+                        <span class="fw-medium">ARS ${{ '{:,.0f}'.format(sale.sale_price_ars) }}</span>
+                    </div>
+                    <hr style="border-color: rgba(255,255,255,0.2);">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-white-50 small">Ganancia USD:</span>
+                        <span class="fw-bold" style="color: #4ade80; font-size: 1.1rem;">USD ${{ '{:,.2f}'.format(sale.profit_usd) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-white-50 small">Ganancia ARS:</span>
+                        <span class="fw-medium" style="color: #4ade80;">ARS ${{ '{:,.0f}'.format(sale.profit_ars) }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if sale.notes %}
+    <div class="card border-0 shadow-sm rounded-4 mt-4">
+        <div class="card-body p-4">
+            <h6 class="fw-semibold mb-2" style="color: var(--color-text);">Notas</h6>
+            <p class="mb-0" style="color: var(--color-muted);">{{ sale.notes }}</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

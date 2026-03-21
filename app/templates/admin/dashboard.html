@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard — PosadasTecnologica Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1" style="color: var(--color-text);">
+                <i class="bi bi-speedometer2 me-2" style="color: var(--color-accent);"></i>Dashboard
+            </h2>
+            <p class="mb-0" style="color: var(--color-muted);">
+                {{ now.strftime('%B %Y') }} — Resumen general
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('products.new_product') }}" class="btn btn-sm text-white" style="background-color: var(--color-accent);">
+                <i class="bi bi-plus-circle me-1"></i>Nuevo Producto
+            </a>
+            <a href="{{ url_for('sales.new_sale') }}" class="btn btn-sm text-white" style="background-color: var(--color-success);">
+                <i class="bi bi-cart-plus me-1"></i>Registrar Venta
+            </a>
+        </div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="row g-4 mb-4">
+        <!-- Total Products -->
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100 stat-card">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="stat-label">Total Productos</p>
+                            <h2 class="stat-value">{{ total_products }}</h2>
+                            <p class="stat-sub">
+                                <span style="color: var(--color-success);">
+                                    <i class="bi bi-check-circle me-1"></i>{{ products_in_stock }} en stock
+                                </span>
+                            </p>
+                        </div>
+                        <div class="stat-icon" style="background-color: rgba(0,174,239,0.1); color: var(--color-accent);">
+                            <i class="bi bi-box-seam-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customers -->
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100 stat-card">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="stat-label">Clientes</p>
+                            <h2 class="stat-value">{{ total_customers }}</h2>
+                            <p class="stat-sub" style="color: var(--color-muted);">registrados</p>
+                        </div>
+                        <div class="stat-icon" style="background-color: rgba(10,46,92,0.1); color: var(--color-primary);">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Sales Count -->
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100 stat-card">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="stat-label">Ventas del Mes</p>
+                            <h2 class="stat-value">{{ total_sales_month }}</h2>
+                            <p class="stat-sub" style="color: var(--color-muted);">transacciones</p>
+                        </div>
+                        <div class="stat-icon" style="background-color: rgba(255,107,0,0.1); color: var(--color-accent-alt);">
+                            <i class="bi bi-cart-check-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Revenue -->
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100 stat-card">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="stat-label">Ingresos del Mes</p>
+                            <h2 class="stat-value" style="font-size: 1.4rem;">USD ${{ '{:,.0f}'.format(total_revenue_usd) }}</h2>
+                            <p class="stat-sub" style="color: var(--color-muted);">
+                                ARS ${{ '{:,.0f}'.format(total_revenue_ars) }}
+                            </p>
+                        </div>
+                        <div class="stat-icon" style="background-color: rgba(22,163,74,0.1); color: var(--color-success);">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Recent Sales -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header border-0 bg-white rounded-top-4 py-3 px-4 d-flex justify-content-between align-items-center">
+                    <h6 class="fw-semibold mb-0" style="color: var(--color-text);">
+                        <i class="bi bi-clock-history me-2" style="color: var(--color-accent);"></i>
+                        Ventas Recientes
+                    </h6>
+                    <a href="{{ url_for('sales.list_sales') }}" class="btn btn-sm" style="color: var(--color-accent);">
+                        Ver todas <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    {% if recent_sales %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead style="background-color: var(--color-surface);">
+                                <tr>
+                                    <th class="px-4 py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Fecha</th>
+                                    <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Producto</th>
+                                    <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Cliente</th>
+                                    <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Venta USD</th>
+                                    <th class="pe-4 py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Ganancia</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for sale in recent_sales %}
+                                <tr>
+                                    <td class="px-4 py-3 small" style="color: var(--color-muted);">
+                                        {{ sale.created_at.strftime('%d/%m/%Y') }}
+                                    </td>
+                                    <td class="py-3">
+                                        <span class="fw-medium small" style="color: var(--color-text);">
+                                            {{ sale.product.name if sale.product else 'N/A' }}
+                                        </span>
+                                    </td>
+                                    <td class="py-3 small" style="color: var(--color-muted);">
+                                        {{ sale.customer.name if sale.customer else 'Sin cliente' }}
+                                    </td>
+                                    <td class="py-3 fw-semibold" style="color: var(--color-accent-alt);">
+                                        USD ${{ '{:,.2f}'.format(sale.sale_price_usd) }}
+                                    </td>
+                                    <td class="pe-4 py-3 fw-semibold" style="color: var(--color-success);">
+                                        USD ${{ '{:,.2f}'.format(sale.profit_usd) }}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-cart-x" style="font-size: 2.5rem; color: var(--color-border);"></i>
+                        <p class="mt-2 mb-0" style="color: var(--color-muted);">No hay ventas registradas aún</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions + Exchange Rate -->
+        <div class="col-lg-4">
+            <!-- Exchange Rate Card -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-semibold mb-0" style="color: var(--color-text);">
+                            <i class="bi bi-currency-exchange me-2" style="color: var(--color-accent);"></i>
+                            Tipo de Cambio
+                        </h6>
+                        <a href="{{ url_for('config_bp.config') }}" class="btn btn-sm" style="color: var(--color-accent); font-size: 0.75rem;">
+                            Actualizar
+                        </a>
+                    </div>
+                    <div class="text-center py-2">
+                        <div class="fw-bold" style="font-size: 1.8rem; color: var(--color-primary);">
+                            ${{ '{:,.0f}'.format(exchange_rate) }}
+                        </div>
+                        <div class="small" style="color: var(--color-muted);">ARS por 1 USD</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profit Card -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <h6 class="fw-semibold mb-3" style="color: var(--color-text);">
+                        <i class="bi bi-graph-up me-2" style="color: var(--color-success);"></i>
+                        Ganancia del Mes
+                    </h6>
+                    <div class="mb-2">
+                        <span class="small" style="color: var(--color-muted);">En USD</span>
+                        <div class="fw-bold" style="color: var(--color-success); font-size: 1.3rem;">
+                            USD ${{ '{:,.2f}'.format(total_profit_usd) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <h6 class="fw-semibold mb-3" style="color: var(--color-text);">
+                        <i class="bi bi-lightning-charge me-2" style="color: var(--color-accent-alt);"></i>
+                        Acciones Rápidas
+                    </h6>
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('products.new_product') }}" class="btn btn-sm text-white fw-medium" style="background-color: var(--color-accent);">
+                            <i class="bi bi-plus-circle me-2"></i>Agregar Producto
+                        </a>
+                        <a href="{{ url_for('sales.new_sale') }}" class="btn btn-sm text-white fw-medium" style="background-color: var(--color-success);">
+                            <i class="bi bi-cart-plus me-2"></i>Registrar Venta
+                        </a>
+                        <a href="{{ url_for('sales.simulator') }}" class="btn btn-sm text-white fw-medium" style="background-color: var(--color-accent-alt);">
+                            <i class="bi bi-calculator me-2"></i>Simulador de Precios
+                        </a>
+                        <a href="{{ url_for('config_bp.config') }}" class="btn btn-sm fw-medium" style="background-color: var(--color-surface); color: var(--color-primary); border: 1px solid var(--color-border);">
+                            <i class="bi bi-gear me-2"></i>Configurar Cambio
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

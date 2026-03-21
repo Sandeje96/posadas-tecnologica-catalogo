@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+
+{% block title %}Productos — PosadasTecnologica Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1" style="color: var(--color-text);">
+                <i class="bi bi-box-seam me-2" style="color: var(--color-accent);"></i>Productos
+            </h2>
+            <p class="mb-0" style="color: var(--color-muted);">{{ products|length }} productos en el catálogo</p>
+        </div>
+        <a href="{{ url_for('products.new_product') }}" class="btn text-white fw-medium" style="background-color: var(--color-accent);">
+            <i class="bi bi-plus-circle me-2"></i>Agregar Producto
+        </a>
+    </div>
+
+    <!-- Filters -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-3">
+            <form method="GET" class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label class="form-label small fw-medium" style="color: var(--color-muted);">Buscar</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white" style="border-color: var(--color-border);">
+                            <i class="bi bi-search" style="color: var(--color-muted);"></i>
+                        </span>
+                        <input type="text" class="form-control" name="buscar" value="{{ search }}"
+                               placeholder="Nombre, marca, modelo..."
+                               style="border-color: var(--color-border);">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-medium" style="color: var(--color-muted);">Categoría</label>
+                    <select class="form-select" name="categoria" style="border-color: var(--color-border);">
+                        <option value="">Todas las categorías</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn w-100 fw-medium text-white" style="background-color: var(--color-primary);">
+                        <i class="bi bi-funnel me-1"></i>Filtrar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Products Table -->
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-0">
+            {% if products %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead style="background-color: var(--color-surface);">
+                        <tr>
+                            <th class="px-4 py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase; width: 60px;">Img</th>
+                            <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Producto</th>
+                            <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Categoría</th>
+                            <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Costo USD</th>
+                            <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Venta USD</th>
+                            <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Margen %</th>
+                            <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Stock</th>
+                            <th class="pe-4 py-3 fw-medium text-end" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <!-- Thumbnail -->
+                            <td class="px-4 py-3">
+                                {% if product.image_filename %}
+                                <img src="{{ url_for('static', filename='uploads/' + product.image_filename) }}"
+                                     alt="{{ product.name }}"
+                                     class="rounded-3"
+                                     style="width: 48px; height: 48px; object-fit: cover;">
+                                {% else %}
+                                <div class="rounded-3 d-flex align-items-center justify-content-center"
+                                     style="width: 48px; height: 48px; background-color: var(--color-surface);">
+                                    <i class="bi bi-image" style="color: var(--color-muted);"></i>
+                                </div>
+                                {% endif %}
+                            </td>
+
+                            <!-- Name / Brand -->
+                            <td class="py-3">
+                                <div class="fw-semibold small" style="color: var(--color-text);">{{ product.name }}</div>
+                                <div class="small" style="color: var(--color-muted);">{{ product.brand }} {{ product.model }}</div>
+                            </td>
+
+                            <!-- Category -->
+                            <td class="py-3">
+                                <span class="badge rounded-pill" style="background-color: rgba(0,174,239,0.15); color: var(--color-accent); font-size: 0.7rem;">
+                                    {{ product.category }}
+                                </span>
+                            </td>
+
+                            <!-- Cost USD -->
+                            <td class="py-3 small fw-medium" style="color: var(--color-muted);">
+                                USD ${{ '{:,.2f}'.format(product.cost_price_usd) }}
+                            </td>
+
+                            <!-- Sale USD -->
+                            <td class="py-3 fw-semibold" style="color: var(--color-accent-alt);">
+                                USD ${{ '{:,.2f}'.format(product.sale_price_usd) }}
+                            </td>
+
+                            <!-- Margin -->
+                            <td class="py-3">
+                                {% set margin = product.profit_margin_percent %}
+                                <span class="badge rounded-pill fw-medium"
+                                      style="background-color: {% if margin >= 20 %}rgba(22,163,74,0.15); color: var(--color-success){% elif margin >= 10 %}rgba(255,107,0,0.15); color: var(--color-accent-alt){% else %}rgba(220,38,38,0.15); color: var(--color-danger){% endif %};">
+                                    {{ '{:.1f}'.format(margin) }}%
+                                </span>
+                            </td>
+
+                            <!-- Stock Toggle -->
+                            <td class="py-3">
+                                <button
+                                    class="btn btn-sm rounded-pill fw-medium stock-toggle-btn"
+                                    data-product-id="{{ product.id }}"
+                                    data-url="{{ url_for('products.toggle_stock', product_id=product.id) }}"
+                                    style="{% if product.stock %}background-color: rgba(22,163,74,0.15); color: var(--color-success); border: 1px solid rgba(22,163,74,0.3);{% else %}background-color: rgba(220,38,38,0.15); color: var(--color-danger); border: 1px solid rgba(220,38,38,0.3);{% endif %} font-size: 0.75rem;"
+                                >
+                                    {% if product.stock %}
+                                    <i class="bi bi-check-circle me-1"></i>En stock
+                                    {% else %}
+                                    <i class="bi bi-x-circle me-1"></i>Sin stock
+                                    {% endif %}
+                                </button>
+                            </td>
+
+                            <!-- Actions -->
+                            <td class="pe-4 py-3 text-end">
+                                <a href="{{ url_for('products.edit_product', product_id=product.id) }}"
+                                   class="btn btn-sm me-1"
+                                   style="background-color: var(--color-surface); color: var(--color-primary); border: 1px solid var(--color-border);">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <button class="btn btn-sm btn-delete"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal"
+                                        data-product-id="{{ product.id }}"
+                                        data-product-name="{{ product.name }}"
+                                        style="background-color: rgba(220,38,38,0.1); color: var(--color-danger); border: 1px solid rgba(220,38,38,0.2);">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-box-seam" style="font-size: 3rem; color: var(--color-border);"></i>
+                <h5 class="mt-3" style="color: var(--color-muted);">No hay productos</h5>
+                <p style="color: var(--color-muted);">
+                    {% if search or selected_category %}
+                    No se encontraron productos con los filtros aplicados.
+                    <a href="{{ url_for('products.list_products') }}">Limpiar filtros</a>
+                    {% else %}
+                    Agrega el primer producto al catálogo.
+                    {% endif %}
+                </p>
+                <a href="{{ url_for('products.new_product') }}" class="btn text-white" style="background-color: var(--color-accent);">
+                    <i class="bi bi-plus-circle me-2"></i>Agregar Producto
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" style="color: var(--color-text);">
+                    <i class="bi bi-exclamation-triangle-fill me-2" style="color: var(--color-danger);"></i>
+                    Confirmar eliminación
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-3">
+                <p style="color: var(--color-muted);">
+                    ¿Estás seguro que deseas eliminar el producto <strong id="deleteProductName" style="color: var(--color-text);"></strong>?
+                    Esta acción no se puede deshacer.
+                </p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn fw-medium" data-bs-dismiss="modal"
+                        style="background-color: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border);">
+                    Cancelar
+                </button>
+                <form id="deleteForm" method="POST">
+                    <button type="submit" class="btn fw-medium text-white" style="background-color: var(--color-danger);">
+                        <i class="bi bi-trash3 me-1"></i>Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

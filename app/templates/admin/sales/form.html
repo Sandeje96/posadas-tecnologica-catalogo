@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}Nueva Venta — PosadasTecnologica Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+
+    <!-- Header -->
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="{{ url_for('sales.list_sales') }}" class="btn btn-sm" style="color: var(--color-primary); background-color: var(--color-surface); border: 1px solid var(--color-border);">
+            <i class="bi bi-arrow-left me-1"></i>Volver
+        </a>
+        <div>
+            <h2 class="fw-bold mb-0" style="color: var(--color-text);">
+                <i class="bi bi-cart-plus me-2" style="color: var(--color-accent);"></i>
+                Registrar Nueva Venta
+            </h2>
+        </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('sales.new_sale') }}" id="saleForm">
+        <div class="row g-4">
+
+            <!-- Left Column: Form -->
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header border-0 bg-white rounded-top-4 py-3 px-4">
+                        <h6 class="fw-semibold mb-0" style="color: var(--color-text);">
+                            <i class="bi bi-box-seam me-2" style="color: var(--color-accent);"></i>
+                            Seleccionar Producto
+                        </h6>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <label class="form-label fw-medium" style="color: var(--color-text);">
+                                Producto <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" name="product_id" id="productSelect" required
+                                    style="border-color: var(--color-border);">
+                                <option value="">— Selecciona un producto —</option>
+                                {% for product in products %}
+                                <option value="{{ product.id }}"
+                                        data-cost="{{ product.cost_price_usd }}"
+                                        data-sale="{{ product.sale_price_usd }}"
+                                        data-name="{{ product.name }}">
+                                    {{ product.name }}
+                                    {% if product.brand %} — {{ product.brand }}{% endif %}
+                                    (Costo: USD ${{ '{:,.2f}'.format(product.cost_price_usd) }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium" style="color: var(--color-text);">
+                                    Costo del Producto (USD)
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white" style="border-color: var(--color-border);">
+                                        <i class="bi bi-currency-dollar" style="color: var(--color-muted);"></i>
+                                    </span>
+                                    <input type="number" class="form-control" id="costPriceDisplay"
+                                           placeholder="0.00" step="0.01" readonly
+                                           style="border-color: var(--color-border); background-color: var(--color-surface);">
+                                </div>
+                                <div class="form-text" style="color: var(--color-muted);">Se llena automáticamente</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium" style="color: var(--color-text);">
+                                    Precio de Venta (USD) <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white" style="border-color: var(--color-border);">
+                                        <i class="bi bi-currency-dollar" style="color: var(--color-accent-alt);"></i>
+                                    </span>
+                                    <input type="number" class="form-control fw-bold" name="sale_price_usd" id="salePriceInput"
+                                           placeholder="0.00" step="0.01" min="0" required
+                                           style="border-color: var(--color-border); color: var(--color-accent-alt);">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customer -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header border-0 bg-white rounded-top-4 py-3 px-4">
+                        <h6 class="fw-semibold mb-0" style="color: var(--color-text);">
+                            <i class="bi bi-person me-2" style="color: var(--color-accent);"></i>
+                            Cliente (Opcional)
+                        </h6>
+                    </div>
+                    <div class="card-body p-4">
+                        <select class="form-select mb-2" name="customer_id" style="border-color: var(--color-border);">
+                            <option value="">Sin cliente (venta directa)</option>
+                            {% for customer in customers %}
+                            <option value="{{ customer.id }}">
+                                {{ customer.name }}
+                                {% if customer.phone %} — {{ customer.phone }}{% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <div class="text-end">
+                            <a href="{{ url_for('customers.new_customer') }}" class="small text-decoration-none" style="color: var(--color-accent);">
+                                <i class="bi bi-person-plus me-1"></i>Crear nuevo cliente
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes -->
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-body p-4">
+                        <label class="form-label fw-medium" style="color: var(--color-text);">
+                            <i class="bi bi-chat-left-text me-2" style="color: var(--color-accent);"></i>
+                            Notas (Opcional)
+                        </label>
+                        <textarea class="form-control" name="notes" rows="3"
+                                  placeholder="Observaciones sobre la venta, forma de pago, etc."
+                                  style="border-color: var(--color-border);"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Calculation Preview -->
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm rounded-4 sticky-top" style="top: 80px;">
+                    <div class="card-header border-0 rounded-top-4 py-3 px-4" style="background-color: var(--color-primary);">
+                        <h6 class="fw-semibold mb-0 text-white">
+                            <i class="bi bi-calculator me-2" style="color: var(--color-accent);"></i>
+                            Resumen de la Venta
+                        </h6>
+                    </div>
+                    <div class="card-body p-4">
+                        <!-- Exchange Rate Display -->
+                        <div class="mb-4 p-3 rounded-3 text-center" style="background-color: var(--color-surface); border: 1px solid var(--color-border);">
+                            <div class="small fw-medium mb-1" style="color: var(--color-muted);">Tipo de cambio actual</div>
+                            <div class="fw-bold" style="font-size: 1.3rem; color: var(--color-primary);">
+                                USD 1 = ARS ${{ '{:,.0f}'.format(exchange_rate) }}
+                            </div>
+                        </div>
+
+                        <!-- Calculation Rows -->
+                        <div class="calc-row mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="small" style="color: var(--color-muted);">
+                                    <i class="bi bi-tag me-1"></i>Precio de costo:
+                                </span>
+                                <span class="fw-medium" id="calcCost" style="color: var(--color-text);">—</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="small" style="color: var(--color-muted);">
+                                    <i class="bi bi-cart me-1"></i>Precio de venta USD:
+                                </span>
+                                <span class="fw-bold" id="calcSaleUsd" style="color: var(--color-accent-alt);">—</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="small" style="color: var(--color-muted);">
+                                    <i class="bi bi-cash me-1"></i>Precio de venta ARS:
+                                </span>
+                                <span class="fw-medium" id="calcSaleArs" style="color: var(--color-text);">—</span>
+                            </div>
+
+                            <hr style="border-color: var(--color-border);">
+
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="small fw-medium" style="color: var(--color-muted);">
+                                    <i class="bi bi-graph-up me-1"></i>Ganancia USD:
+                                </span>
+                                <span class="fw-bold" id="calcProfitUsd" style="color: var(--color-success); font-size: 1.1rem;">—</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="small fw-medium" style="color: var(--color-muted);">
+                                    <i class="bi bi-graph-up me-1"></i>Ganancia ARS:
+                                </span>
+                                <span class="fw-bold" id="calcProfitArs" style="color: var(--color-success);">—</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="small fw-medium" style="color: var(--color-muted);">Margen:</span>
+                                <span class="badge" id="calcMargin" style="background-color: var(--color-surface); color: var(--color-muted); font-size: 0.9rem;">—</span>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn fw-semibold text-white py-3" style="background-color: var(--color-success);">
+                                <i class="bi bi-check-circle-fill me-2"></i>Registrar Venta
+                            </button>
+                            <a href="{{ url_for('sales.list_sales') }}" class="btn fw-medium"
+                               style="background-color: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border);">
+                                <i class="bi bi-x-circle me-2"></i>Cancelar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const CURRENT_EXCHANGE_RATE = {{ exchange_rate }};
+</script>
+{% endblock %}

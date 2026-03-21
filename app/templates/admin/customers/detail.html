@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ customer.name }} — PosadasTecnologica Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+
+    <!-- Header -->
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="{{ url_for('customers.list_customers') }}" class="btn btn-sm" style="color: var(--color-primary); background-color: var(--color-surface); border: 1px solid var(--color-border);">
+            <i class="bi bi-arrow-left me-1"></i>Volver
+        </a>
+        <h2 class="fw-bold mb-0" style="color: var(--color-text);">
+            <i class="bi bi-person-circle me-2" style="color: var(--color-accent);"></i>
+            {{ customer.name }}
+        </h2>
+    </div>
+
+    <div class="row g-4">
+        <!-- Customer Info -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <!-- Avatar -->
+                    <div class="text-center mb-4">
+                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center fw-bold mx-auto"
+                             style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--color-primary), var(--color-accent)); color: white; font-size: 2rem;">
+                            {{ customer.name[0].upper() }}
+                        </div>
+                        <h5 class="fw-bold mt-3 mb-1" style="color: var(--color-text);">{{ customer.name }}</h5>
+                        <p class="small mb-0" style="color: var(--color-muted);">
+                            Cliente desde {{ customer.created_at.strftime('%B %Y') }}
+                        </p>
+                    </div>
+
+                    <!-- Contact Info -->
+                    <div class="border-top pt-3" style="border-color: var(--color-border) !important;">
+                        {% if customer.phone %}
+                        <div class="mb-3">
+                            <div class="small fw-medium mb-1" style="color: var(--color-muted);">Teléfono</div>
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-telephone" style="color: var(--color-muted);"></i>
+                                <span style="color: var(--color-text);">{{ customer.phone }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if customer.email %}
+                        <div class="mb-3">
+                            <div class="small fw-medium mb-1" style="color: var(--color-muted);">Email</div>
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-envelope" style="color: var(--color-muted);"></i>
+                                <a href="mailto:{{ customer.email }}" class="text-decoration-none small" style="color: var(--color-accent);">
+                                    {{ customer.email }}
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if customer.notes %}
+                        <div class="mb-3">
+                            <div class="small fw-medium mb-1" style="color: var(--color-muted);">Notas</div>
+                            <p class="small mb-0" style="color: var(--color-text);">{{ customer.notes }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-2 mt-3">
+                        {% if customer.phone %}
+                        <a href="https://wa.me/{{ customer.phone | replace('+', '') | replace(' ', '') | replace('-', '') }}"
+                           target="_blank"
+                           class="btn fw-medium text-white" style="background-color: #25D366;">
+                            <i class="bi bi-whatsapp me-2"></i>Contactar por WhatsApp
+                        </a>
+                        {% endif %}
+                        <a href="{{ url_for('customers.edit_customer', customer_id=customer.id) }}"
+                           class="btn fw-medium" style="background-color: var(--color-surface); color: var(--color-primary); border: 1px solid var(--color-border);">
+                            <i class="bi bi-pencil me-2"></i>Editar cliente
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <h6 class="fw-semibold mb-3" style="color: var(--color-text);">Resumen de Compras</h6>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="text-center p-3 rounded-3" style="background-color: var(--color-surface);">
+                                <div class="fw-bold" style="font-size: 1.5rem; color: var(--color-primary);">{{ sales|length }}</div>
+                                <div class="small" style="color: var(--color-muted);">Compras</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center p-3 rounded-3" style="background-color: var(--color-surface);">
+                                <div class="fw-bold" style="font-size: 1.1rem; color: var(--color-accent-alt);">
+                                    ${{ '{:,.0f}'.format(total_spent_usd) }}
+                                </div>
+                                <div class="small" style="color: var(--color-muted);">Total USD</div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="text-center p-3 rounded-3" style="background-color: var(--color-surface);">
+                                <div class="fw-bold" style="font-size: 1rem; color: var(--color-muted);">
+                                    ARS ${{ '{:,.0f}'.format(total_spent_ars) }}
+                                </div>
+                                <div class="small" style="color: var(--color-muted);">Total en Pesos</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Purchase History -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header border-0 bg-white rounded-top-4 py-3 px-4">
+                    <h6 class="fw-semibold mb-0" style="color: var(--color-text);">
+                        <i class="bi bi-clock-history me-2" style="color: var(--color-accent);"></i>
+                        Historial de Compras
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    {% if sales %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead style="background-color: var(--color-surface);">
+                                <tr>
+                                    <th class="px-4 py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Fecha</th>
+                                    <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Producto</th>
+                                    <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Precio USD</th>
+                                    <th class="pe-4 py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Precio ARS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for sale in sales %}
+                                <tr>
+                                    <td class="px-4 py-3 small" style="color: var(--color-muted);">
+                                        {{ sale.created_at.strftime('%d/%m/%Y') }}
+                                    </td>
+                                    <td class="py-3">
+                                        <div class="fw-medium small" style="color: var(--color-text);">
+                                            {{ sale.product.name if sale.product else 'Producto eliminado' }}
+                                        </div>
+                                    </td>
+                                    <td class="py-3 fw-semibold small" style="color: var(--color-accent-alt);">
+                                        USD ${{ '{:,.2f}'.format(sale.sale_price_usd) }}
+                                    </td>
+                                    <td class="pe-4 py-3 small" style="color: var(--color-muted);">
+                                        ARS ${{ '{:,.0f}'.format(sale.sale_price_ars) }}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-cart-x" style="font-size: 2.5rem; color: var(--color-border);"></i>
+                        <p class="mt-2 mb-0" style="color: var(--color-muted);">Este cliente aún no tiene compras registradas</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

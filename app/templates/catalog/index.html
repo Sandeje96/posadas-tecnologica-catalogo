@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+
+{% block title %}Catálogo de Productos — PosadasTecnologica{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div style="background: linear-gradient(135deg, var(--color-primary) 0%, #1a4a8a 100%); color: white;">
+    <div class="container-fluid px-4 py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <h1 class="display-5 fw-bold mb-2">
+                    Tecnología al mejor precio
+                </h1>
+                <p class="lead mb-4 text-white-75">
+                    Smartphones, laptops, impresoras y más. Encontrá lo que necesitás.
+                </p>
+                <div class="d-flex align-items-center gap-3 flex-wrap">
+                    <span class="badge py-2 px-3 rounded-pill" style="background-color: rgba(255,255,255,0.15); font-size: 0.9rem;">
+                        <i class="bi bi-currency-exchange me-1" style="color: var(--color-accent);"></i>
+                        USD 1 = ARS {{ '{:,.0f}'.format(exchange_rate) }}
+                    </span>
+                    <span class="badge py-2 px-3 rounded-pill" style="background-color: rgba(255,255,255,0.15); font-size: 0.9rem;">
+                        <i class="bi bi-box-seam me-1" style="color: var(--color-accent);"></i>
+                        {{ products_data|length }} productos disponibles
+                    </span>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-flex justify-content-end">
+                <i class="bi bi-laptop" style="font-size: 8rem; color: rgba(255,255,255,0.1);"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search & Filters Section -->
+<div style="background-color: var(--color-surface); border-bottom: 1px solid var(--color-border); position: sticky; top: 0; z-index: 100;">
+    <div class="container-fluid px-4 py-3">
+        <div class="row align-items-center gap-3 gap-md-0">
+            <!-- Search Bar -->
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0" style="border-color: var(--color-border);">
+                        <i class="bi bi-search" style="color: var(--color-muted);"></i>
+                    </span>
+                    <input
+                        type="text"
+                        class="form-control border-start-0 ps-0"
+                        id="searchInput"
+                        placeholder="Buscar productos, marcas..."
+                        value="{{ search_query }}"
+                        style="border-color: var(--color-border);"
+                    >
+                    <button class="btn text-white" id="clearSearch" style="background-color: var(--color-muted); display: none;">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Category Filters -->
+            <div class="col-md-7">
+                <div class="d-flex gap-2 flex-wrap">
+                    <button class="btn btn-sm category-filter {% if not selected_category or selected_category == 'Todos' %}active{% endif %}"
+                            data-category="Todos">
+                        <i class="bi bi-grid-3x3-gap me-1"></i>Todos
+                    </button>
+                    {% for cat in categories %}
+                    <button class="btn btn-sm category-filter {% if selected_category == cat %}active{% endif %}"
+                            data-category="{{ cat }}">
+                        {% if cat == 'Smartphones' %}<i class="bi bi-phone me-1"></i>
+                        {% elif cat == 'Laptops' %}<i class="bi bi-laptop me-1"></i>
+                        {% elif cat == 'Tablets' %}<i class="bi bi-tablet me-1"></i>
+                        {% elif cat == 'Impresoras' %}<i class="bi bi-printer me-1"></i>
+                        {% else %}<i class="bi bi-plug me-1"></i>{% endif %}
+                        {{ cat }}
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Products Grid -->
+<div class="container-fluid px-4 py-4">
+    <div id="noResults" class="text-center py-5 d-none">
+        <i class="bi bi-search" style="font-size: 3rem; color: var(--color-muted);"></i>
+        <h4 class="mt-3" style="color: var(--color-muted);">No se encontraron productos</h4>
+        <p style="color: var(--color-muted);">Intenta con otros términos de búsqueda.</p>
+    </div>
+
+    <div class="row g-4" id="productsGrid">
+        {% for item in products_data %}
+        {% set product = item.product %}
+        {% set ars_price = item.ars_price %}
+        <div class="col-6 col-md-4 col-lg-3 col-xl-3 product-card-col"
+             data-name="{{ product.name|lower }}"
+             data-brand="{{ product.brand|lower }}"
+             data-model="{{ product.model|lower }}"
+             data-description="{{ (product.description or '')|lower }}"
+             data-category="{{ product.category }}">
+            <div class="card product-card h-100 border-0 shadow-sm rounded-4 overflow-hidden"
+                 onclick="openProductModal({{ product.id }})"
+                 style="cursor: pointer;">
+
+                <!-- Badge -->
+                {% if product.badge %}
+                <div class="product-badge-container">
+                    {% if product.badge == 'mas-vendido' %}
+                    <span class="badge badge-hot"><i class="bi bi-fire me-1"></i>Más vendido</span>
+                    {% elif product.badge == 'nuevo' %}
+                    <span class="badge badge-new"><i class="bi bi-stars me-1"></i>Nuevo</span>
+                    {% elif product.badge == 'oferta' %}
+                    <span class="badge badge-offer"><i class="bi bi-tag me-1"></i>Oferta</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Product Image -->
+                <div class="product-image-container">
+                    {% if product.image_filename %}
+                    <img
+                        src="{{ url_for('static', filename='uploads/' + product.image_filename) }}"
+                        alt="{{ product.name }}"
+                        class="product-image"
+                        loading="lazy"
+                    >
+                    {% else %}
+                    <div class="product-image-placeholder">
+                        {% if product.category == 'Smartphones' %}
+                        <i class="bi bi-phone"></i>
+                        {% elif product.category == 'Laptops' %}
+                        <i class="bi bi-laptop"></i>
+                        {% elif product.category == 'Tablets' %}
+                        <i class="bi bi-tablet"></i>
+                        {% elif product.category == 'Impresoras' %}
+                        <i class="bi bi-printer"></i>
+                        {% else %}
+                        <i class="bi bi-plug"></i>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body d-flex flex-column p-3">
+                    <!-- Category & Stock -->
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge rounded-pill" style="background-color: rgba(0,174,239,0.15); color: var(--color-accent); font-size: 0.7rem;">
+                            {{ product.category }}
+                        </span>
+                        {% if product.stock %}
+                        <span class="badge rounded-pill" style="background-color: rgba(22,163,74,0.1); color: var(--color-success); font-size: 0.7rem;">
+                            <i class="bi bi-check-circle me-1"></i>Disponible
+                        </span>
+                        {% else %}
+                        <span class="badge rounded-pill" style="background-color: rgba(220,38,38,0.1); color: var(--color-danger); font-size: 0.7rem;">
+                            <i class="bi bi-x-circle me-1"></i>Sin stock
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Product Name -->
+                    <h6 class="fw-bold mb-1 product-name" style="color: var(--color-text);">{{ product.name }}</h6>
+
+                    <!-- Brand/Model -->
+                    <p class="small mb-2" style="color: var(--color-muted);">
+                        {{ product.brand }}{% if product.model %} · {{ product.model }}{% endif %}
+                    </p>
+
+                    <!-- Description -->
+                    {% if product.description %}
+                    <p class="small mb-3 product-description" style="color: var(--color-muted);">
+                        {{ product.description[:80] }}{% if product.description|length > 80 %}...{% endif %}
+                    </p>
+                    {% endif %}
+
+                    <!-- Prices -->
+                    <div class="mt-auto">
+                        <div class="price-usd fw-bold mb-1" style="color: var(--color-accent-alt); font-size: 1.1rem;">
+                            <i class="bi bi-currency-dollar"></i>USD {{ '{:,.2f}'.format(product.sale_price_usd) }}
+                        </div>
+                        <div class="price-ars small" style="color: var(--color-muted);">
+                            ARS ${{ '{:,.0f}'.format(ars_price) }}
+                        </div>
+                    </div>
+
+                    <!-- Button -->
+                    <button class="btn btn-sm mt-3 w-100 fw-medium" style="background-color: var(--color-accent); color: white; border: none;">
+                        <i class="bi bi-eye me-1"></i>Ver detalles
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="bi bi-box-seam" style="font-size: 4rem; color: var(--color-border);"></i>
+                <h4 class="mt-3" style="color: var(--color-muted);">No hay productos disponibles</h4>
+                <p style="color: var(--color-muted);">El catálogo está vacío por el momento.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Product Detail Modal -->
+<div class="modal fade" id="productModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 overflow-hidden">
+            <div class="modal-header border-0 pb-0" style="background-color: var(--color-surface);">
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0" id="modalBody" style="background-color: var(--color-surface);">
+                <div class="text-center p-5">
+                    <div class="spinner-border" style="color: var(--color-accent);" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const EXCHANGE_RATE = {{ exchange_rate }};
+</script>
+{% endblock %}

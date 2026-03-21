@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}Configuración — PosadasTecnologica Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+
+    <!-- Header -->
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-sm" style="color: var(--color-primary); background-color: var(--color-surface); border: 1px solid var(--color-border);">
+            <i class="bi bi-arrow-left me-1"></i>Dashboard
+        </a>
+        <div>
+            <h2 class="fw-bold mb-0" style="color: var(--color-text);">
+                <i class="bi bi-gear me-2" style="color: var(--color-accent);"></i>Configuración
+            </h2>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Exchange Rate -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header border-0 bg-white rounded-top-4 py-3 px-4">
+                    <h6 class="fw-semibold mb-0" style="color: var(--color-text);">
+                        <i class="bi bi-currency-exchange me-2" style="color: var(--color-accent);"></i>
+                        Tipo de Cambio USD / ARS
+                    </h6>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Current Rate Display -->
+                    <div class="mb-4 p-4 rounded-3 text-center" style="background: linear-gradient(135deg, var(--color-primary), #1a4a8a);">
+                        <div class="small text-white-50 mb-1">Tipo de cambio actual</div>
+                        <div class="fw-bold text-white" style="font-size: 2.5rem;">
+                            ${{ '{:,.2f}'.format(exchange_rate) }}
+                        </div>
+                        <div class="text-white-50 small">ARS por cada USD 1</div>
+                    </div>
+
+                    <!-- Update Form -->
+                    <form method="POST" action="{{ url_for('config_bp.config') }}">
+                        <div class="mb-4">
+                            <label class="form-label fw-medium" style="color: var(--color-text);">
+                                Nuevo tipo de cambio (ARS por USD)
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white fw-medium" style="border-color: var(--color-border);">
+                                    ARS $
+                                </span>
+                                <input type="number" class="form-control fw-bold"
+                                       name="exchange_rate"
+                                       value="{{ exchange_rate }}"
+                                       step="0.01" min="1" required
+                                       style="border-color: var(--color-border); font-size: 1.1rem; color: var(--color-primary);">
+                            </div>
+                            <div class="form-text" style="color: var(--color-muted);">
+                                Este valor se usa para calcular los precios en pesos en el catálogo.
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn fw-semibold text-white py-3" style="background-color: var(--color-accent);">
+                                <i class="bi bi-save me-2"></i>Actualizar Tipo de Cambio
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Card -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <h6 class="fw-semibold mb-3" style="color: var(--color-text);">
+                        <i class="bi bi-info-circle me-2" style="color: var(--color-accent);"></i>
+                        ¿Qué afecta el tipo de cambio?
+                    </h6>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-3 d-flex gap-3">
+                            <i class="bi bi-check-circle-fill flex-shrink-0" style="color: var(--color-success); margin-top: 3px;"></i>
+                            <div>
+                                <div class="fw-medium small" style="color: var(--color-text);">Catálogo público</div>
+                                <div class="small" style="color: var(--color-muted);">Los precios en ARS que ven los clientes</div>
+                            </div>
+                        </li>
+                        <li class="mb-3 d-flex gap-3">
+                            <i class="bi bi-check-circle-fill flex-shrink-0" style="color: var(--color-success); margin-top: 3px;"></i>
+                            <div>
+                                <div class="fw-medium small" style="color: var(--color-text);">Registro de ventas</div>
+                                <div class="small" style="color: var(--color-muted);">El tipo de cambio se guarda en cada venta al momento de registrarla</div>
+                            </div>
+                        </li>
+                        <li class="mb-3 d-flex gap-3">
+                            <i class="bi bi-check-circle-fill flex-shrink-0" style="color: var(--color-success); margin-top: 3px;"></i>
+                            <div>
+                                <div class="fw-medium small" style="color: var(--color-text);">Simulador de precios</div>
+                                <div class="small" style="color: var(--color-muted);">Las conversiones en el simulador usan el valor actual</div>
+                            </div>
+                        </li>
+                        <li class="d-flex gap-3">
+                            <i class="bi bi-info-circle-fill flex-shrink-0" style="color: var(--color-accent); margin-top: 3px;"></i>
+                            <div>
+                                <div class="fw-medium small" style="color: var(--color-text);">Ventas anteriores</div>
+                                <div class="small" style="color: var(--color-muted);">No se modifican: cada venta tiene su tipo de cambio histórico guardado</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Quick links -->
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <h6 class="fw-semibold mb-3" style="color: var(--color-text);">
+                        <i class="bi bi-lightning-charge me-2" style="color: var(--color-accent-alt);"></i>
+                        Accesos Rápidos
+                    </h6>
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('catalog.index') }}" class="btn btn-sm text-white" style="background-color: var(--color-accent);">
+                            <i class="bi bi-eye me-2"></i>Ver catálogo público
+                        </a>
+                        <a href="{{ url_for('sales.simulator') }}" class="btn btn-sm text-white" style="background-color: var(--color-accent-alt);">
+                            <i class="bi bi-calculator me-2"></i>Simulador de precios
+                        </a>
+                        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-sm" style="background-color: var(--color-surface); color: var(--color-primary); border: 1px solid var(--color-border);">
+                            <i class="bi bi-speedometer2 me-2"></i>Volver al dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
