@@ -9,16 +9,6 @@ from sqlalchemy import func
 admin_bp = Blueprint('admin', __name__)
 
 
-@admin_bp.route('/bulk-clean', methods=['POST'])
-@login_required
-def bulk_clean():
-    """Ruta temporal: limpia badge y descripción de todos los productos."""
-    from sqlalchemy import text
-    with db.engine.connect() as conn:
-        conn.execute(text("UPDATE products SET badge = NULL, description = NULL"))
-        conn.commit()
-    return "OK: badge y descripcion limpiados en todos los productos."
-
 
 @admin_bp.route('/')
 @admin_bp.route('/dashboard')
