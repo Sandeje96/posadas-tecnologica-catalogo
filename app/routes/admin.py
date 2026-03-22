@@ -10,6 +10,24 @@ admin_bp = Blueprint('admin', __name__)
 
 
 
+@admin_bp.route('/update-image/<int:product_id>', methods=['POST'])
+@login_required
+def update_image(product_id):
+    """Ruta temporal: actualiza solo la imagen de un producto."""
+    from app.routes.products import save_image
+    product = Product.query.get_or_404(product_id)
+    if 'image' in request.files and request.files['image'].filename != '':
+        new_image = save_image(request.files['image'])
+        if new_image:
+            if product.image_filename:
+                from app.routes.products import delete_image
+                delete_image(product.image_filename)
+            product.image_filename = new_image
+            db.session.commit()
+            return f"OK:{product_id}"
+    return f"FAIL:{product_id}", 400
+
+
 @admin_bp.route('/')
 @admin_bp.route('/dashboard')
 @login_required
