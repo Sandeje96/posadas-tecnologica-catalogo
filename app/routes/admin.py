@@ -1,6 +1,6 @@
 from datetime import datetime, date
 from decimal import Decimal
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
 from app.routes.auth import login_required
 from app.models import Product, Sale, Customer, Setting
 from app import db
