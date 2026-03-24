@@ -106,3 +106,21 @@ def upload_image():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+
+@admin_bp.route('/update-motorola-prices', methods=['POST'])
+@login_required
+def update_motorola_prices():
+    from decimal import Decimal
+    try:
+        motorola_products = Product.query.filter(Product.brand.ilike('motorola')).all()
+        updated = []
+        for p in motorola_products:
+            old_sale = float(p.sale_price_usd)
+            p.sale_price_usd = Decimal(str(p.cost_price_usd)) + Decimal('20.5')
+            updated.append({'id': p.id, 'name': p.name, 'cost': float(p.cost_price_usd), 'old_sale': old_sale, 'new_sale': float(p.sale_price_usd)})
+        db.session.commit()
+        return jsonify({'updated': len(updated), 'products': updated})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
