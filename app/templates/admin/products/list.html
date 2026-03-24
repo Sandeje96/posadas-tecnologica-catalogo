@@ -64,6 +64,8 @@
                             <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Categoría</th>
                             <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Costo USD</th>
                             <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Venta USD</th>
+                            <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Ganancia USD</th>
+                            <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Ganancia ARS</th>
                             <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Margen %</th>
                             <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Stock</th>
                             <th class="pe-4 py-3 fw-medium text-end" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Acciones</th>
@@ -108,6 +110,16 @@
                             <!-- Sale USD -->
                             <td class="py-3 fw-semibold" style="color: var(--color-accent-alt);">
                                 USD ${{ '{:,.2f}'.format(product.sale_price_usd) }}
+                            </td>
+
+                            <!-- Profit USD -->
+                            <td class="py-3 fw-semibold small" style="color: var(--color-success);">
+                                USD ${{ '{:,.2f}'.format(product.profit_usd) }}
+                            </td>
+
+                            <!-- Profit ARS -->
+                            <td class="py-3 fw-semibold small" style="color: var(--color-success);">
+                                ${{ '{:,.0f}'.format(product.profit_usd * exchange_rate) }}
                             </td>
 
                             <!-- Margin -->

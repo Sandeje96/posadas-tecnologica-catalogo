@@ -5,6 +5,8 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from werkzeug.utils import secure_filename
 from app import db
 from app.models import Product
+from app.models import Product, Setting
+from decimal import Decimal as _Decimal
 from app.routes.auth import login_required
 
 products_bp = Blueprint('products', __name__)
@@ -73,12 +75,18 @@ def list_products():
 
     products = query.order_by(Product.created_at.desc()).all()
 
+    try:
+        exchange_rate = _Decimal(Setting.get('exchange_rate', '1000'))
+    except Exception:
+        exchange_rate = _Decimal('1000')
+
     return render_template(
         'admin/products/list.html',
         products=products,
         categories=CATEGORIES,
         search=search,
-        selected_category=categoria
+        selected_category=categoria,
+        exchange_rate=exchange_rate
     )
 
 
