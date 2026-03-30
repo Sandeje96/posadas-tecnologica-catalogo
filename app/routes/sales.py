@@ -60,7 +60,12 @@ def new_sale():
             except Exception:
                 current_rate = Decimal('1000')
 
-            cost_price_usd = Decimal(str(product.cost_price_usd))
+            # Usar el costo enviado desde el form (puede haber sido modificado manualmente)
+            form_cost = request.form.get('cost_price_usd', '').strip()
+            try:
+                cost_price_usd = Decimal(form_cost) if form_cost else Decimal(str(product.cost_price_usd))
+            except Exception:
+                cost_price_usd = Decimal(str(product.cost_price_usd))
             sale_price_ars = sale_price_usd * current_rate
             profit_usd = sale_price_usd - cost_price_usd
             profit_ars = profit_usd * current_rate

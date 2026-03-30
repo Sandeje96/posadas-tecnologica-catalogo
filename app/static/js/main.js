@@ -338,6 +338,10 @@ function initSaleForm() {
     updateCalc();
   });
 
+  if (costDisplay) {
+    costDisplay.addEventListener('input', updateCalc);
+  }
+
   if (salePriceInput) {
     salePriceInput.addEventListener('input', updateCalc);
   }
