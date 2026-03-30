@@ -61,6 +61,7 @@
                         <tr>
                             <th class="px-4 py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase; width: 60px;">Img</th>
                             <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Producto</th>
+                            <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">RAM / Storage</th>
                             <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Categoría</th>
                             <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Costo USD</th>
                             <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Venta USD</th>
@@ -68,6 +69,7 @@
                             <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Ganancia ARS</th>
                             <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Margen %</th>
                             <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Stock</th>
+                            <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">MercadoLibre</th>
                             <th class="pe-4 py-3 fw-medium text-end" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Acciones</th>
                         </tr>
                     </thead>
@@ -93,6 +95,25 @@
                             <td class="py-3">
                                 <div class="fw-semibold small" style="color: var(--color-text);">{{ product.name }}</div>
                                 <div class="small" style="color: var(--color-muted);">{{ product.brand }} {{ product.model }}</div>
+                            </td>
+
+                            <!-- RAM / Storage -->
+                            <td class="py-3">
+                                <div class="d-flex flex-column gap-1">
+                                    {% if product.ram %}
+                                    <span class="badge rounded-pill px-2" style="background-color: rgba(10,46,92,0.08); color: var(--color-primary); font-size: 0.7rem; width: fit-content;">
+                                        <i class="bi bi-memory me-1"></i>{{ product.ram }}
+                                    </span>
+                                    {% endif %}
+                                    {% if product.storage %}
+                                    <span class="badge rounded-pill px-2" style="background-color: rgba(10,46,92,0.08); color: var(--color-primary); font-size: 0.7rem; width: fit-content;">
+                                        <i class="bi bi-device-hdd me-1"></i>{{ product.storage }}
+                                    </span>
+                                    {% endif %}
+                                    {% if not product.ram and not product.storage %}
+                                    <span style="color: var(--color-muted); font-size: 0.8rem;">—</span>
+                                    {% endif %}
+                                </div>
                             </td>
 
                             <!-- Category -->
@@ -145,6 +166,23 @@
                                     <i class="bi bi-x-circle me-1"></i>Sin stock
                                     {% endif %}
                                 </button>
+                            </td>
+
+                            <!-- MercadoLibre Toggle -->
+                            <td class="py-3">
+                                <div class="d-flex flex-column align-items-center gap-1">
+                                    <div class="form-check form-switch mb-0">
+                                        <input class="form-check-input ml-toggle" type="checkbox"
+                                               role="switch"
+                                               data-product-id="{{ product.id }}"
+                                               data-url="{{ url_for('products.toggle_mercadolibre', product_id=product.id) }}"
+                                               {% if product.mercadolibre_active %}checked{% endif %}
+                                               style="cursor: pointer; width: 2.2em; height: 1.2em;">
+                                    </div>
+                                    <span class="ml-toggle-label" style="font-size: 0.7rem; color: {% if product.mercadolibre_active %}var(--color-success){% else %}var(--color-muted){% endif %};">
+                                        {% if product.mercadolibre_active %}Publicado{% else %}Sin publicar{% endif %}
+                                    </span>
+                                </div>
                             </td>
 
                             <!-- Actions -->

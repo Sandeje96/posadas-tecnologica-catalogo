@@ -54,7 +54,7 @@ def create_app():
         try:
             from sqlalchemy import text
             with db.engine.connect() as conn:
-                for col, tipo in [('ram', 'VARCHAR(50)'), ('storage', 'VARCHAR(50)'), ('color', 'VARCHAR(50)')]:
+                for col, tipo in [('ram', 'VARCHAR(50)'), ('storage', 'VARCHAR(50)'), ('color', 'VARCHAR(50)'), ('mercadolibre_active', 'BOOLEAN DEFAULT FALSE')]:
                     conn.execute(text(f'ALTER TABLE products ADD COLUMN IF NOT EXISTS {col} {tipo}'))
                 conn.commit()
         except Exception:

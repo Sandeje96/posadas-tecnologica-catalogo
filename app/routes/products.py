@@ -207,6 +207,20 @@ def delete_product(product_id):
     return redirect(url_for('products.list_products'))
 
 
+@products_bp.route('/<int:product_id>/toggle-mercadolibre', methods=['POST'])
+@login_required
+def toggle_mercadolibre(product_id):
+    product = Product.query.get_or_404(product_id)
+    try:
+        product.mercadolibre_active = not product.mercadolibre_active
+        db.session.commit()
+        estado = 'activo' if product.mercadolibre_active else 'inactivo'
+        return jsonify({'success': True, 'active': product.mercadolibre_active, 'message': f'MercadoLibre {estado}.'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
 @products_bp.route('/<int:product_id>/toggle-stock', methods=['POST'])
 @login_required
 def toggle_stock(product_id):

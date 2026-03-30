@@ -422,6 +422,40 @@ function initStockToggles() {
 }
 
 /* ----------------------------------------------------------
+   MercadoLibre Toggle (Product List)
+   ---------------------------------------------------------- */
+
+function initMercadolibreToggles() {
+  document.querySelectorAll('.ml-toggle').forEach(checkbox => {
+    checkbox.addEventListener('change', function () {
+      const url = this.dataset.url;
+      const isChecked = this.checked;
+      const label = this.closest('td').querySelector('.ml-toggle-label');
+      this.disabled = true;
+
+      fetch(url, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            if (label) {
+              label.textContent = data.active ? 'Publicado' : 'Sin publicar';
+              label.style.color = data.active ? 'var(--color-success)' : 'var(--color-muted)';
+            }
+          } else {
+            this.checked = !isChecked;
+            alert('Error: ' + (data.message || 'No se pudo actualizar'));
+          }
+          this.disabled = false;
+        })
+        .catch(() => {
+          this.checked = !isChecked;
+          this.disabled = false;
+        });
+    });
+  });
+}
+
+/* ----------------------------------------------------------
    Simulator
    ---------------------------------------------------------- */
 
@@ -608,6 +642,7 @@ document.addEventListener('DOMContentLoaded', function () {
   initSaleForm();
   initDeleteModals();
   initStockToggles();
+  initMercadolibreToggles();
   initSimulator();
 
   // Auto-dismiss alerts after 5 seconds

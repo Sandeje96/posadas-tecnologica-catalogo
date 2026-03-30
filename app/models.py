@@ -19,6 +19,7 @@ class Product(db.Model):
     storage = db.Column(db.String(50), nullable=True)
     color = db.Column(db.String(50), nullable=True)
     stock = db.Column(db.Boolean, default=True, nullable=False)
+    mercadolibre_active = db.Column(db.Boolean, default=False, nullable=False)
     badge = db.Column(db.String(50), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

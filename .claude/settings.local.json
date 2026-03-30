@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:web-production-250f7.up.railway.app)",
+      "WebFetch(domain:listado.mercadolibre.com.ar)",
+      "WebFetch(domain:www.google.com)"
+    ]
+  }
+}
