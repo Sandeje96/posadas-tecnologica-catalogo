@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Nueva Venta — PosadasTecnologica Admin{% endblock %}
+{% block title %}Editar Venta #{{ sale.id }} — PosadasTecnologica Admin{% endblock %}
 
 {% block content %}
 <div class="container-fluid px-4 py-4">
@@ -12,13 +12,16 @@
         </a>
         <div>
             <h2 class="fw-bold mb-0" style="color: var(--color-text);">
-                <i class="bi bi-cart-plus me-2" style="color: var(--color-accent);"></i>
-                Registrar Nueva Venta
+                <i class="bi bi-pencil-square me-2" style="color: var(--color-accent);"></i>
+                Editar Venta <span style="color: var(--color-muted);">#{{ sale.id }}</span>
             </h2>
+            <p class="mb-0 small" style="color: var(--color-muted);">
+                Registrada el {{ sale.created_at.strftime('%d/%m/%Y a las %H:%M') }}
+            </p>
         </div>
     </div>
 
-    <form method="POST" action="{{ url_for('sales.new_sale') }}" id="saleForm">
+    <form method="POST" action="{{ url_for('sales.edit_sale', sale_id=sale.id) }}" id="saleForm">
         <div class="row g-4">
 
             <!-- Left Column: Form -->
@@ -27,7 +30,7 @@
                     <div class="card-header border-0 bg-white rounded-top-4 py-3 px-4">
                         <h6 class="fw-semibold mb-0" style="color: var(--color-text);">
                             <i class="bi bi-box-seam me-2" style="color: var(--color-accent);"></i>
-                            Seleccionar Producto
+                            Producto
                         </h6>
                     </div>
                     <div class="card-body p-4">
@@ -42,7 +45,8 @@
                                 <option value="{{ product.id }}"
                                         data-cost="{{ product.cost_price_usd }}"
                                         data-sale="{{ product.sale_price_usd }}"
-                                        data-name="{{ product.name }}">
+                                        data-name="{{ product.name }}"
+                                        {% if product.id == sale.product_id %}selected{% endif %}>
                                     {{ product.name }}
                                     {% if product.ram %} | {{ product.ram }} RAM{% endif %}
                                     {% if product.storage %} | {{ product.storage }}{% endif %}
@@ -65,10 +69,11 @@
                                     </span>
                                     <input type="number" class="form-control" id="costPriceDisplay"
                                            name="cost_price_usd"
+                                           value="{{ '{:.2f}'.format(sale.cost_price_usd) }}"
                                            placeholder="0.00" step="0.01" min="0"
                                            style="border-color: var(--color-border);">
                                 </div>
-                                <div class="form-text" style="color: var(--color-muted);">Se llena automáticamente. Podés modificarlo si el costo fue diferente.</div>
+                                <div class="form-text" style="color: var(--color-muted);">Podés modificarlo si el costo fue diferente.</div>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-medium" style="color: var(--color-text);">
@@ -79,6 +84,7 @@
                                         <i class="bi bi-currency-dollar" style="color: var(--color-accent-alt);"></i>
                                     </span>
                                     <input type="number" class="form-control fw-bold" name="sale_price_usd" id="salePriceInput"
+                                           value="{{ '{:.2f}'.format(sale.sale_price_usd) }}"
                                            placeholder="0.00" step="0.01" min="0" required
                                            style="border-color: var(--color-border); color: var(--color-accent-alt);">
                                 </div>
@@ -99,17 +105,12 @@
                         <select class="form-select mb-2" name="customer_id" style="border-color: var(--color-border);">
                             <option value="">Sin cliente (venta directa)</option>
                             {% for customer in customers %}
-                            <option value="{{ customer.id }}">
+                            <option value="{{ customer.id }}" {% if sale.customer_id == customer.id %}selected{% endif %}>
                                 {{ customer.name }}
                                 {% if customer.phone %} — {{ customer.phone }}{% endif %}
                             </option>
                             {% endfor %}
                         </select>
-                        <div class="text-end">
-                            <a href="{{ url_for('customers.new_customer') }}" class="small text-decoration-none" style="color: var(--color-accent);">
-                                <i class="bi bi-person-plus me-1"></i>Crear nuevo cliente
-                            </a>
-                        </div>
                     </div>
                 </div>
 
@@ -122,7 +123,7 @@
                         </label>
                         <textarea class="form-control" name="notes" rows="3"
                                   placeholder="Observaciones sobre la venta, forma de pago, etc."
-                                  style="border-color: var(--color-border);"></textarea>
+                                  style="border-color: var(--color-border);">{{ sale.notes or '' }}</textarea>
                     </div>
                 </div>
             </div>
@@ -137,11 +138,14 @@
                         </h6>
                     </div>
                     <div class="card-body p-4">
-                        <!-- Exchange Rate Display -->
+                        <!-- Exchange Rate -->
                         <div class="mb-4 p-3 rounded-3 text-center" style="background-color: var(--color-surface); border: 1px solid var(--color-border);">
                             <div class="small fw-medium mb-1" style="color: var(--color-muted);">Tipo de cambio actual</div>
                             <div class="fw-bold" style="font-size: 1.3rem; color: var(--color-primary);">
                                 USD 1 = ARS ${{ exchange_rate|fmt(0) }}
+                            </div>
+                            <div class="small mt-1" style="color: var(--color-muted);">
+                                Original: ARS ${{ sale.exchange_rate|fmt(0) }}
                             </div>
                         </div>
 
@@ -187,8 +191,8 @@
                         </div>
 
                         <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn fw-semibold text-white py-3" style="background-color: var(--color-success);">
-                                <i class="bi bi-check-circle-fill me-2"></i>Registrar Venta
+                            <button type="submit" class="btn fw-semibold text-white py-3" style="background-color: var(--color-accent);">
+                                <i class="bi bi-check-circle-fill me-2"></i>Guardar Cambios
                             </button>
                             <a href="{{ url_for('sales.list_sales') }}" class="btn fw-medium"
                                style="background-color: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border);">

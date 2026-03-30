@@ -46,6 +46,15 @@ def create_app():
     app.register_blueprint(customers_bp, url_prefix='/admin/clientes')
     app.register_blueprint(config_bp, url_prefix='/admin/configuracion')
 
+    # Filtro Jinja2: formato numérico argentino (punto=miles, coma=decimales)
+    @app.template_filter('fmt')
+    def format_ar_number(value, decimals=2):
+        try:
+            formatted = f"{float(value):,.{decimals}f}"
+            return formatted.replace(',', 'X').replace('.', ',').replace('X', '.')
+        except (ValueError, TypeError):
+            return str(value)
+
     # Crear tablas automáticamente si no existen (primer deploy)
     with app.app_context():
         from app.models import Product, Customer, Sale, Setting  # noqa: F401

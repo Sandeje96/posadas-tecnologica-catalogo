@@ -35,7 +35,7 @@
                         </div>
                         <div class="col-6">
                             <div class="small" style="color: var(--color-muted);">Tipo de cambio</div>
-                            <div class="fw-medium" style="color: var(--color-text);">ARS ${{ '{:,.2f}'.format(sale.exchange_rate) }}</div>
+                            <div class="fw-medium" style="color: var(--color-text);">ARS ${{ sale.exchange_rate|fmt }}</div>
                         </div>
                     </div>
                 </div>
@@ -47,24 +47,24 @@
                     <h6 class="fw-semibold mb-4 text-white-50" style="text-transform: uppercase; font-size: 0.8rem;">Resumen Financiero</h6>
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-white-50 small">Costo:</span>
-                        <span class="fw-medium">USD ${{ '{:,.2f}'.format(sale.cost_price_usd) }}</span>
+                        <span class="fw-medium">USD ${{ sale.cost_price_usd|fmt }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-white-50 small">Venta USD:</span>
-                        <span class="fw-bold" style="color: var(--color-accent);">USD ${{ '{:,.2f}'.format(sale.sale_price_usd) }}</span>
+                        <span class="fw-bold" style="color: var(--color-accent);">USD ${{ sale.sale_price_usd|fmt }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-3">
                         <span class="text-white-50 small">Venta ARS:</span>
-                        <span class="fw-medium">ARS ${{ '{:,.0f}'.format(sale.sale_price_ars) }}</span>
+                        <span class="fw-medium">ARS ${{ sale.sale_price_ars|fmt(0) }}</span>
                     </div>
                     <hr style="border-color: rgba(255,255,255,0.2);">
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-white-50 small">Ganancia USD:</span>
-                        <span class="fw-bold" style="color: #4ade80; font-size: 1.1rem;">USD ${{ '{:,.2f}'.format(sale.profit_usd) }}</span>
+                        <span class="fw-bold" style="color: #4ade80; font-size: 1.1rem;">USD ${{ sale.profit_usd|fmt }}</span>
                     </div>
                     <div class="d-flex justify-content-between">
                         <span class="text-white-50 small">Ganancia ARS:</span>
-                        <span class="fw-medium" style="color: #4ade80;">ARS ${{ '{:,.0f}'.format(sale.profit_ars) }}</span>
+                        <span class="fw-medium" style="color: #4ade80;">ARS ${{ sale.profit_ars|fmt(0) }}</span>
                     </div>
                 </div>
             </div>

@@ -94,7 +94,7 @@
                         <div class="col-6">
                             <div class="text-center p-3 rounded-3" style="background-color: var(--color-surface);">
                                 <div class="fw-bold" style="font-size: 1.1rem; color: var(--color-accent-alt);">
-                                    ${{ '{:,.0f}'.format(total_spent_usd) }}
+                                    ${{ total_spent_usd|fmt(0) }}
                                 </div>
                                 <div class="small" style="color: var(--color-muted);">Total USD</div>
                             </div>
@@ -102,7 +102,7 @@
                         <div class="col-12">
                             <div class="text-center p-3 rounded-3" style="background-color: var(--color-surface);">
                                 <div class="fw-bold" style="font-size: 1rem; color: var(--color-muted);">
-                                    ARS ${{ '{:,.0f}'.format(total_spent_ars) }}
+                                    ARS ${{ total_spent_ars|fmt(0) }}
                                 </div>
                                 <div class="small" style="color: var(--color-muted);">Total en Pesos</div>
                             </div>
@@ -145,10 +145,10 @@
                                         </div>
                                     </td>
                                     <td class="py-3 fw-semibold small" style="color: var(--color-accent-alt);">
-                                        USD ${{ '{:,.2f}'.format(sale.sale_price_usd) }}
+                                        USD ${{ sale.sale_price_usd|fmt }}
                                     </td>
                                     <td class="pe-4 py-3 small" style="color: var(--color-muted);">
-                                        ARS ${{ '{:,.0f}'.format(sale.sale_price_ars) }}
+                                        ARS ${{ sale.sale_price_ars|fmt(0) }}
                                     </td>
                                 </tr>
                                 {% endfor %}

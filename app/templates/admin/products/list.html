@@ -125,22 +125,22 @@
 
                             <!-- Cost USD -->
                             <td class="py-3 small fw-medium" style="color: var(--color-muted);">
-                                USD ${{ '{:,.2f}'.format(product.cost_price_usd) }}
+                                USD ${{ product.cost_price_usd|fmt }}
                             </td>
 
                             <!-- Sale USD -->
                             <td class="py-3 fw-semibold" style="color: var(--color-accent-alt);">
-                                USD ${{ '{:,.2f}'.format(product.sale_price_usd) }}
+                                USD ${{ product.sale_price_usd|fmt }}
                             </td>
 
                             <!-- Profit USD -->
                             <td class="py-3 fw-semibold small" style="color: var(--color-success);">
-                                USD ${{ '{:,.2f}'.format(product.profit_usd) }}
+                                USD ${{ product.profit_usd|fmt }}
                             </td>
 
                             <!-- Profit ARS -->
                             <td class="py-3 fw-semibold small" style="color: var(--color-success);">
-                                ${{ '{:,.0f}'.format(product.profit_usd * exchange_rate) }}
+                                ${{ (product.profit_usd * exchange_rate)|fmt(0) }}
                             </td>
 
                             <!-- Margin -->
@@ -148,7 +148,7 @@
                                 {% set margin = product.profit_margin_percent %}
                                 <span class="badge rounded-pill fw-medium"
                                       style="background-color: {% if margin >= 20 %}rgba(22,163,74,0.15); color: var(--color-success){% elif margin >= 10 %}rgba(255,107,0,0.15); color: var(--color-accent-alt){% else %}rgba(220,38,38,0.15); color: var(--color-danger){% endif %};">
-                                    {{ '{:.1f}'.format(margin) }}%
+                                    {{ margin|fmt(1) }}%
                                 </span>
                             </td>
 

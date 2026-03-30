@@ -38,7 +38,7 @@
                 <div class="card-body p-3 text-center">
                     <div class="small fw-medium mb-1" style="color: var(--color-muted);">Ingresos USD</div>
                     <div class="fw-bold" style="font-size: 1.1rem; color: var(--color-accent-alt);">
-                        ${{ '{:,.2f}'.format(total_revenue_usd) }}
+                        ${{ total_revenue_usd|fmt }}
                     </div>
                 </div>
             </div>
@@ -48,7 +48,7 @@
                 <div class="card-body p-3 text-center">
                     <div class="small fw-medium mb-1" style="color: var(--color-muted);">Ingresos ARS</div>
                     <div class="fw-bold" style="font-size: 1.1rem; color: var(--color-accent-alt);">
-                        ${{ '{:,.0f}'.format(total_revenue_ars) }}
+                        ${{ total_revenue_ars|fmt(0) }}
                     </div>
                 </div>
             </div>
@@ -58,7 +58,7 @@
                 <div class="card-body p-3 text-center">
                     <div class="small fw-medium mb-1" style="color: var(--color-muted);">Ganancia USD</div>
                     <div class="fw-bold" style="font-size: 1.1rem; color: var(--color-success);">
-                        ${{ '{:,.2f}'.format(total_profit_usd) }}
+                        ${{ total_profit_usd|fmt }}
                     </div>
                 </div>
             </div>
@@ -104,27 +104,32 @@
                                 {{ sale.customer.name if sale.customer else 'Sin cliente' }}
                             </td>
                             <td class="py-3 fw-semibold small" style="color: var(--color-accent-alt);">
-                                ${{ '{:,.2f}'.format(sale.sale_price_usd) }}
+                                ${{ sale.sale_price_usd|fmt }}
                             </td>
                             <td class="py-3 small" style="color: var(--color-muted);">
-                                ${{ '{:,.0f}'.format(sale.sale_price_ars) }}
+                                ${{ sale.sale_price_ars|fmt(0) }}
                             </td>
                             <td class="py-3 small" style="color: var(--color-muted);">
-                                ${{ '{:,.2f}'.format(sale.cost_price_usd) }}
+                                ${{ sale.cost_price_usd|fmt }}
                             </td>
                             <td class="py-3 fw-semibold small" style="color: var(--color-success);">
-                                ${{ '{:,.2f}'.format(sale.profit_usd) }}
+                                ${{ sale.profit_usd|fmt }}
                             </td>
                             <td class="py-3 small" style="color: var(--color-success);">
-                                ${{ '{:,.0f}'.format(sale.profit_ars) }}
+                                ${{ sale.profit_ars|fmt(0) }}
                             </td>
                             <td class="py-3">
                                 <span class="badge rounded-pill fw-medium"
                                       style="{% if margin >= 20 %}background-color: rgba(22,163,74,0.15); color: var(--color-success);{% elif margin >= 10 %}background-color: rgba(255,107,0,0.15); color: var(--color-accent-alt);{% else %}background-color: rgba(220,38,38,0.15); color: var(--color-danger);{% endif %} font-size: 0.7rem;">
-                                    {{ '{:.1f}'.format(margin) }}%
+                                    {{ margin|fmt(1) }}%
                                 </span>
                             </td>
                             <td class="pe-4 py-3 text-end">
+                                <a href="{{ url_for('sales.edit_sale', sale_id=sale.id) }}"
+                                   class="btn btn-sm me-1"
+                                   style="background-color: var(--color-surface); color: var(--color-primary); border: 1px solid var(--color-border);">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
                                 <button class="btn btn-sm btn-delete-sale"
                                         data-bs-toggle="modal"
                                         data-bs-target="#deleteSaleModal"

@@ -17,7 +17,7 @@
                 <div class="d-flex align-items-center gap-3 flex-wrap">
                     <span class="badge py-2 px-3 rounded-pill" style="background-color: rgba(255,255,255,0.15); font-size: 0.9rem;">
                         <i class="bi bi-currency-exchange me-1" style="color: var(--color-accent);"></i>
-                        USD 1 = ARS {{ '{:,.0f}'.format(exchange_rate) }}
+                        USD 1 = ARS {{ exchange_rate|fmt(0) }}
                     </span>
                     <span class="badge py-2 px-3 rounded-pill" style="background-color: rgba(255,255,255,0.15); font-size: 0.9rem;">
                         <i class="bi bi-box-seam me-1" style="color: var(--color-accent);"></i>
@@ -198,10 +198,10 @@
                     <!-- Prices -->
                     <div class="mt-auto">
                         <div class="price-usd fw-bold mb-1" style="color: var(--color-accent-alt); font-size: 1.1rem;">
-                            <i class="bi bi-currency-dollar"></i>USD {{ '{:,.2f}'.format(product.sale_price_usd) }}
+                            <i class="bi bi-currency-dollar"></i>USD {{ product.sale_price_usd|fmt }}
                         </div>
                         <div class="price-ars small" style="color: var(--color-muted);">
-                            ARS ${{ '{:,.0f}'.format(ars_price) }}
+                            ARS ${{ ars_price|fmt(0) }}
                         </div>
                     </div>
 

@@ -92,9 +92,9 @@
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <p class="stat-label">Ingresos del Mes</p>
-                            <h2 class="stat-value" style="font-size: 1.4rem;">USD ${{ '{:,.0f}'.format(total_revenue_usd) }}</h2>
+                            <h2 class="stat-value" style="font-size: 1.4rem;">USD ${{ total_revenue_usd|fmt(0) }}</h2>
                             <p class="stat-sub" style="color: var(--color-muted);">
-                                ARS ${{ '{:,.0f}'.format(total_revenue_ars) }}
+                                ARS ${{ total_revenue_ars|fmt(0) }}
                             </p>
                         </div>
                         <div class="stat-icon" style="background-color: rgba(22,163,74,0.1); color: var(--color-success);">
@@ -147,10 +147,10 @@
                                         {{ sale.customer.name if sale.customer else 'Sin cliente' }}
                                     </td>
                                     <td class="py-3 fw-semibold" style="color: var(--color-accent-alt);">
-                                        USD ${{ '{:,.2f}'.format(sale.sale_price_usd) }}
+                                        USD ${{ sale.sale_price_usd|fmt }}
                                     </td>
                                     <td class="pe-4 py-3 fw-semibold" style="color: var(--color-success);">
-                                        USD ${{ '{:,.2f}'.format(sale.profit_usd) }}
+                                        USD ${{ sale.profit_usd|fmt }}
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -183,7 +183,7 @@
                     </div>
                     <div class="text-center py-2">
                         <div class="fw-bold" style="font-size: 1.8rem; color: var(--color-primary);">
-                            ${{ '{:,.0f}'.format(exchange_rate) }}
+                            ${{ exchange_rate|fmt(0) }}
                         </div>
                         <div class="small" style="color: var(--color-muted);">ARS por 1 USD</div>
                     </div>
@@ -200,7 +200,7 @@
                     <div class="mb-2">
                         <span class="small" style="color: var(--color-muted);">En USD</span>
                         <div class="fw-bold" style="color: var(--color-success); font-size: 1.3rem;">
-                            USD ${{ '{:,.2f}'.format(total_profit_usd) }}
+                            USD ${{ total_profit_usd|fmt }}
                         </div>
                     </div>
                 </div>

@@ -105,7 +105,7 @@
                             </td>
                             <td class="py-3 fw-semibold small" style="color: var(--color-accent-alt);">
                                 {% if item.total_spent_usd > 0 %}
-                                USD ${{ '{:,.2f}'.format(item.total_spent_usd) }}
+                                USD ${{ item.total_spent_usd|fmt }}
                                 {% else %}—{% endif %}
                             </td>
                             <td class="py-3 small" style="color: var(--color-muted);">

@@ -105,6 +105,65 @@ def sale_detail(sale_id):
     return render_template('admin/sales/detail.html', sale=sale)
 
 
+@sales_bp.route('/<int:sale_id>/editar', methods=['GET', 'POST'])
+@login_required
+def edit_sale(sale_id):
+    sale = Sale.query.get_or_404(sale_id)
+    products = Product.query.order_by(Product.name).all()
+    customers = Customer.query.order_by(Customer.name).all()
+
+    try:
+        exchange_rate = Decimal(Setting.get('exchange_rate', '1000'))
+    except Exception:
+        exchange_rate = Decimal('1000')
+
+    if request.method == 'POST':
+        try:
+            product_id = int(request.form.get('product_id'))
+            customer_id = request.form.get('customer_id')
+            sale_price_usd = Decimal(request.form.get('sale_price_usd', '0') or '0')
+            notes = request.form.get('notes', '').strip()
+
+            product = Product.query.get_or_404(product_id)
+
+            try:
+                current_rate = Decimal(Setting.get('exchange_rate', '1000'))
+            except Exception:
+                current_rate = Decimal('1000')
+
+            form_cost = request.form.get('cost_price_usd', '').strip()
+            try:
+                cost_price_usd = Decimal(form_cost) if form_cost else Decimal(str(product.cost_price_usd))
+            except Exception:
+                cost_price_usd = Decimal(str(product.cost_price_usd))
+
+            sale.product_id = product_id
+            sale.customer_id = int(customer_id) if customer_id and customer_id.isdigit() else None
+            sale.sale_price_usd = sale_price_usd
+            sale.exchange_rate = current_rate
+            sale.sale_price_ars = sale_price_usd * current_rate
+            sale.cost_price_usd = cost_price_usd
+            sale.profit_usd = sale_price_usd - cost_price_usd
+            sale.profit_ars = (sale_price_usd - cost_price_usd) * current_rate
+            sale.notes = notes
+
+            db.session.commit()
+            flash('Venta actualizada exitosamente.', 'success')
+            return redirect(url_for('sales.list_sales'))
+
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error al actualizar la venta: {str(e)}', 'danger')
+
+    return render_template(
+        'admin/sales/edit.html',
+        sale=sale,
+        products=products,
+        customers=customers,
+        exchange_rate=exchange_rate
+    )
+
+
 @sales_bp.route('/<int:sale_id>/eliminar', methods=['POST'])
 @login_required
 def delete_sale(sale_id):

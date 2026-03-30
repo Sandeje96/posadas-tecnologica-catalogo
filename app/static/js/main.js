@@ -23,6 +23,12 @@ function formatNumber(value, decimals = 2) {
   return num.toLocaleString('es-AR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
 }
 
+// Convierte número a formato argentino: 1.065,50
+function fmtAR(value, decimals = 2) {
+  const num = parseFloat(value) || 0;
+  return num.toLocaleString('es-AR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
+
 /* ----------------------------------------------------------
    Catalog: Client-side Search & Category Filter
    ---------------------------------------------------------- */

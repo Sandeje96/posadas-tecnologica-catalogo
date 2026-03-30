@@ -31,7 +31,7 @@
                         <div>
                             <div class="small fw-medium" style="color: var(--color-muted);">Tipo de cambio actual</div>
                             <div class="fw-bold" style="font-size: 1.5rem; color: var(--color-primary);">
-                                USD 1 = ARS ${{ '{:,.0f}'.format(exchange_rate) }}
+                                USD 1 = ARS ${{ exchange_rate|fmt(0) }}
                             </div>
                         </div>
                     </div>
@@ -70,7 +70,7 @@
                                 data-sale="{{ product.sale_price_usd }}"
                                 data-id="{{ product.id }}"
                                 data-name="{{ product.name }}">
-                            {{ product.name }} (Costo: ${{ '{:,.2f}'.format(product.cost_price_usd) }})
+                            {{ product.name }} (Costo: ${{ product.cost_price_usd|fmt }})
                         </option>
                         {% endfor %}
                     </select>
