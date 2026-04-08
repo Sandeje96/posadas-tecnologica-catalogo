@@ -37,6 +37,7 @@ def create_app():
     from app.routes.sales import sales_bp
     from app.routes.customers import customers_bp
     from app.routes.config_routes import config_bp
+    from app.routes.batches import batches_bp
 
     app.register_blueprint(catalog_bp)
     app.register_blueprint(auth_bp, url_prefix='/admin')
@@ -45,6 +46,7 @@ def create_app():
     app.register_blueprint(sales_bp, url_prefix='/admin/ventas')
     app.register_blueprint(customers_bp, url_prefix='/admin/clientes')
     app.register_blueprint(config_bp, url_prefix='/admin/configuracion')
+    app.register_blueprint(batches_bp, url_prefix='/admin/lotes')
 
     # Filtro Jinja2: formato numérico argentino (punto=miles, coma=decimales)
     @app.template_filter('fmt')
@@ -57,14 +59,21 @@ def create_app():
 
     # Crear tablas automáticamente si no existen (primer deploy)
     with app.app_context():
-        from app.models import Product, Customer, Sale, Setting  # noqa: F401
+        from app.models import Product, Customer, Sale, Setting, SaleBatch, BatchExpense  # noqa: F401
         db.create_all()
         # Agregar columnas nuevas si la tabla ya existía (migración manual)
         try:
             from sqlalchemy import text
             with db.engine.connect() as conn:
-                for col, tipo in [('ram', 'VARCHAR(50)'), ('storage', 'VARCHAR(50)'), ('color', 'VARCHAR(50)'), ('mercadolibre_active', 'BOOLEAN DEFAULT FALSE')]:
+                for col, tipo in [
+                    ('ram', 'VARCHAR(50)'),
+                    ('storage', 'VARCHAR(50)'),
+                    ('color', 'VARCHAR(50)'),
+                    ('mercadolibre_active', 'BOOLEAN DEFAULT FALSE'),
+                ]:
                     conn.execute(text(f'ALTER TABLE products ADD COLUMN IF NOT EXISTS {col} {tipo}'))
+                # Columna batch_id en sales (lotes)
+                conn.execute(text('ALTER TABLE sales ADD COLUMN IF NOT EXISTS batch_id INTEGER REFERENCES sale_batches(id)'))
                 conn.commit()
         except Exception:
             pass

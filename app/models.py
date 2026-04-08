@@ -3,6 +3,65 @@ from decimal import Decimal
 from app import db
 
 
+class SaleBatch(db.Model):
+    __tablename__ = 'sale_batches'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    closed_at = db.Column(db.DateTime, nullable=True)
+
+    sales = db.relationship('Sale', backref='batch', lazy=True)
+    expenses = db.relationship('BatchExpense', backref='batch', lazy=True, cascade='all, delete-orphan')
+
+    @property
+    def is_closed(self):
+        return self.closed_at is not None
+
+    @property
+    def total_profit_usd(self):
+        return sum(Decimal(str(s.profit_usd)) for s in self.sales)
+
+    @property
+    def total_profit_ars(self):
+        return sum(Decimal(str(s.profit_ars)) for s in self.sales)
+
+    @property
+    def total_expenses_usd(self):
+        return sum(Decimal(str(e.amount_usd)) for e in self.expenses)
+
+    @property
+    def total_expenses_ars(self):
+        return sum(Decimal(str(e.amount_ars)) for e in self.expenses)
+
+    @property
+    def net_profit_usd(self):
+        return self.total_profit_usd - self.total_expenses_usd
+
+    @property
+    def net_profit_ars(self):
+        return self.total_profit_ars - self.total_expenses_ars
+
+    def __repr__(self):
+        return f'<SaleBatch {self.name}>'
+
+
+class BatchExpense(db.Model):
+    __tablename__ = 'batch_expenses'
+
+    id = db.Column(db.Integer, primary_key=True)
+    batch_id = db.Column(db.Integer, db.ForeignKey('sale_batches.id'), nullable=False)
+    description = db.Column(db.String(300), nullable=False)
+    category = db.Column(db.String(100), nullable=False, default='otros')
+    amount_usd = db.Column(db.Numeric(10, 2), nullable=False, default=0)
+    amount_ars = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<BatchExpense {self.description}>'
+
+
 class Product(db.Model):
     __tablename__ = 'products'
 
@@ -76,6 +135,7 @@ class Sale(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
     customer_id = db.Column(db.Integer, db.ForeignKey('customers.id'), nullable=True)
+    batch_id = db.Column(db.Integer, db.ForeignKey('sale_batches.id'), nullable=True)
     sale_price_usd = db.Column(db.Numeric(10, 2), nullable=False)
     exchange_rate = db.Column(db.Numeric(10, 2), nullable=False)
     sale_price_ars = db.Column(db.Numeric(12, 2), nullable=False)

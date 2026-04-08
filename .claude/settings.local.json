@@ -3,7 +3,8 @@
     "allow": [
       "WebFetch(domain:web-production-250f7.up.railway.app)",
       "WebFetch(domain:listado.mercadolibre.com.ar)",
-      "WebFetch(domain:www.google.com)"
+      "WebFetch(domain:www.google.com)",
+      "Bash(python -c \"from app import create_app; app = create_app\\(\\); print\\(''OK''\\)\")"
     ]
   }
 }

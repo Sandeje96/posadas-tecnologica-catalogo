@@ -1,0 +1,417 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ batch.name }} — Lote — PosadasTecnologica Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+        <div>
+            <nav aria-label="breadcrumb" class="mb-1">
+                <ol class="breadcrumb mb-0" style="font-size: 0.8rem;">
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('batches.list_batches') }}" style="color: var(--color-accent);">Lotes</a>
+                    </li>
+                    <li class="breadcrumb-item active" style="color: var(--color-muted);">{{ batch.name }}</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold mb-1" style="color: var(--color-text);">
+                <i class="bi bi-collection me-2" style="color: var(--color-accent);"></i>{{ batch.name }}
+            </h2>
+            <p class="mb-0 small" style="color: var(--color-muted);">
+                Creado {{ batch.created_at.strftime('%d/%m/%Y') }}
+                {% if batch.description %} · {{ batch.description }}{% endif %}
+                {% if batch.is_closed %}
+                · <span style="color: var(--color-muted);"><i class="bi bi-lock-fill me-1"></i>Cerrado {{ batch.closed_at.strftime('%d/%m/%Y') }}</span>
+                {% endif %}
+            </p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <form method="POST" action="{{ url_for('batches.toggle_close', batch_id=batch.id) }}">
+                {% if batch.is_closed %}
+                <button type="submit" class="btn fw-medium" style="background-color: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border);">
+                    <i class="bi bi-unlock me-1"></i>Reabrir lote
+                </button>
+                {% else %}
+                <button type="submit" class="btn fw-medium text-white" style="background-color: var(--color-primary);">
+                    <i class="bi bi-lock me-1"></i>Cerrar lote
+                </button>
+                {% endif %}
+            </form>
+            <button class="btn fw-medium text-white" style="background-color: var(--color-danger);"
+                    data-bs-toggle="modal" data-bs-target="#deleteBatchModal">
+                <i class="bi bi-trash3 me-1"></i>Eliminar
+            </button>
+        </div>
+    </div>
+
+    <!-- Resumen financiero -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-3 text-center">
+                    <div class="small fw-medium mb-1" style="color: var(--color-muted);">Ventas en lote</div>
+                    <div class="fw-bold" style="font-size: 1.4rem; color: var(--color-text);">{{ batch.sales|length }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-3 text-center">
+                    <div class="small fw-medium mb-1" style="color: var(--color-muted);">Ganancia bruta</div>
+                    <div class="fw-bold" style="font-size: 1.1rem; color: var(--color-success);">
+                        ${{ batch.total_profit_usd|fmt }} USD
+                    </div>
+                    <div class="small" style="color: var(--color-muted);">
+                        ${{ batch.total_profit_ars|fmt(0) }} ARS
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-3 text-center">
+                    <div class="small fw-medium mb-1" style="color: var(--color-muted);">Total gastos</div>
+                    <div class="fw-bold" style="font-size: 1.1rem; color: var(--color-accent-alt);">
+                        ${{ batch.total_expenses_usd|fmt }} USD
+                    </div>
+                    <div class="small" style="color: var(--color-muted);">
+                        ${{ batch.total_expenses_ars|fmt(0) }} ARS
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm rounded-4" style="{% if batch.net_profit_usd >= 0 %}border-left: 3px solid var(--color-success) !important;{% else %}border-left: 3px solid var(--color-danger) !important;{% endif %}">
+                <div class="card-body p-3 text-center">
+                    <div class="small fw-medium mb-1" style="color: var(--color-muted);">Ganancia neta</div>
+                    <div class="fw-bold" style="font-size: 1.2rem; color: {% if batch.net_profit_usd >= 0 %}var(--color-success){% else %}var(--color-danger){% endif %};">
+                        ${{ batch.net_profit_usd|fmt }} USD
+                    </div>
+                    <div class="small" style="color: {% if batch.net_profit_usd >= 0 %}var(--color-success){% else %}var(--color-danger){% endif %};">
+                        ${{ batch.net_profit_ars|fmt(0) }} ARS
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Columna izquierda: Ventas del lote -->
+        <div class="col-12 col-lg-7">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header border-0 d-flex justify-content-between align-items-center py-3 px-4"
+                     style="background-color: var(--color-surface); border-radius: 1rem 1rem 0 0 !important;">
+                    <h6 class="fw-bold mb-0" style="color: var(--color-text);">
+                        <i class="bi bi-cart-check me-2" style="color: var(--color-accent);"></i>Ventas ({{ batch.sales|length }})
+                    </h6>
+                    {% if not batch.is_closed and ventas_sin_lote %}
+                    <button class="btn btn-sm fw-medium text-white" style="background-color: var(--color-accent);"
+                            data-bs-toggle="modal" data-bs-target="#addSalesModal">
+                        <i class="bi bi-plus me-1"></i>Agregar ventas
+                    </button>
+                    {% endif %}
+                </div>
+                <div class="card-body p-0">
+                    {% if batch.sales %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead style="background-color: var(--color-surface);">
+                                <tr>
+                                    <th class="px-4 py-2 fw-medium" style="color: var(--color-muted); font-size: 0.75rem; text-transform: uppercase;">Fecha</th>
+                                    <th class="py-2 fw-medium" style="color: var(--color-muted); font-size: 0.75rem; text-transform: uppercase;">Producto</th>
+                                    <th class="py-2 fw-medium" style="color: var(--color-muted); font-size: 0.75rem; text-transform: uppercase;">Venta USD</th>
+                                    <th class="py-2 fw-medium" style="color: var(--color-muted); font-size: 0.75rem; text-transform: uppercase;">Ganancia USD</th>
+                                    {% if not batch.is_closed %}
+                                    <th class="pe-4 py-2"></th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for sale in batch.sales|sort(attribute='created_at', reverse=True) %}
+                                <tr>
+                                    <td class="px-4 py-2 small" style="color: var(--color-muted);">
+                                        {{ sale.created_at.strftime('%d/%m/%Y') }}
+                                    </td>
+                                    <td class="py-2 small fw-medium" style="color: var(--color-text);">
+                                        {{ sale.product.name if sale.product else 'Producto eliminado' }}
+                                    </td>
+                                    <td class="py-2 small fw-semibold" style="color: var(--color-accent-alt);">
+                                        ${{ sale.sale_price_usd|fmt }}
+                                    </td>
+                                    <td class="py-2 small fw-semibold" style="color: var(--color-success);">
+                                        ${{ sale.profit_usd|fmt }}
+                                    </td>
+                                    {% if not batch.is_closed %}
+                                    <td class="pe-4 py-2 text-end">
+                                        <form method="POST"
+                                              action="{{ url_for('batches.remove_sale', batch_id=batch.id, sale_id=sale.id) }}"
+                                              onsubmit="return confirm('¿Quitar esta venta del lote?')">
+                                            <button type="submit" class="btn btn-sm"
+                                                    style="background-color: rgba(220,38,38,0.1); color: var(--color-danger); border: 1px solid rgba(220,38,38,0.2);"
+                                                    title="Quitar del lote">
+                                                <i class="bi bi-x-circle"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                    {% endif %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-cart-x" style="font-size: 2rem; color: var(--color-border);"></i>
+                        <p class="mt-2 small mb-0" style="color: var(--color-muted);">No hay ventas en este lote.</p>
+                        {% if ventas_sin_lote and not batch.is_closed %}
+                        <button class="btn btn-sm text-white mt-2" style="background-color: var(--color-accent);"
+                                data-bs-toggle="modal" data-bs-target="#addSalesModal">
+                            <i class="bi bi-plus me-1"></i>Agregar ventas
+                        </button>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna derecha: Gastos -->
+        <div class="col-12 col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header border-0 d-flex justify-content-between align-items-center py-3 px-4"
+                     style="background-color: var(--color-surface); border-radius: 1rem 1rem 0 0 !important;">
+                    <h6 class="fw-bold mb-0" style="color: var(--color-text);">
+                        <i class="bi bi-receipt me-2" style="color: var(--color-accent-alt);"></i>Gastos ({{ batch.expenses|length }})
+                    </h6>
+                </div>
+                <div class="card-body p-4">
+
+                    <!-- Formulario agregar gasto -->
+                    {% if not batch.is_closed %}
+                    <form method="POST" action="{{ url_for('batches.add_expense', batch_id=batch.id) }}" class="mb-4">
+                        <div class="p-3 rounded-3 mb-3" style="background-color: var(--color-surface);">
+                            <div class="small fw-semibold mb-2" style="color: var(--color-text);">
+                                <i class="bi bi-plus-circle me-1" style="color: var(--color-accent);"></i>Registrar gasto
+                            </div>
+                            <div class="mb-2">
+                                <input type="text" name="description" class="form-control form-control-sm rounded-3"
+                                       placeholder="Descripción del gasto *"
+                                       required style="border-color: var(--color-border);">
+                            </div>
+                            <div class="row g-2 mb-2">
+                                <div class="col-6">
+                                    <select name="category" class="form-select form-select-sm rounded-3"
+                                            style="border-color: var(--color-border);">
+                                        <option value="envio">📦 Envío / caja</option>
+                                        <option value="bolsas">🛍️ Bolsas</option>
+                                        <option value="combustible">⛽ Combustible</option>
+                                        <option value="comision">💳 Comisión / MercadoPago</option>
+                                        <option value="otros" selected>🔧 Otros</option>
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <select name="currency" class="form-select form-select-sm rounded-3"
+                                            style="border-color: var(--color-border);" id="currencySelect{{ batch.id }}">
+                                        <option value="usd">USD $</option>
+                                        <option value="ars">ARS $</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <input type="number" name="amount" class="form-control form-control-sm rounded-3"
+                                       placeholder="Monto" min="0" step="0.01" required
+                                       style="border-color: var(--color-border);">
+                                <button type="submit" class="btn btn-sm fw-medium text-white flex-shrink-0"
+                                        style="background-color: var(--color-accent-alt);">
+                                    <i class="bi bi-plus"></i> Agregar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    {% endif %}
+
+                    <!-- Lista de gastos -->
+                    {% if batch.expenses %}
+                    <ul class="list-unstyled mb-0">
+                        {% for expense in batch.expenses|sort(attribute='created_at', reverse=True) %}
+                        <li class="d-flex justify-content-between align-items-start py-2"
+                            style="border-bottom: 1px solid var(--color-border);">
+                            <div class="flex-grow-1 me-2">
+                                <div class="small fw-medium" style="color: var(--color-text);">
+                                    {% if expense.category == 'envio' %}📦
+                                    {% elif expense.category == 'bolsas' %}🛍️
+                                    {% elif expense.category == 'combustible' %}⛽
+                                    {% elif expense.category == 'comision' %}💳
+                                    {% else %}🔧{% endif %}
+                                    {{ expense.description }}
+                                </div>
+                                <div class="small" style="color: var(--color-muted);">
+                                    ${{ expense.amount_usd|fmt }} USD · ${{ expense.amount_ars|fmt(0) }} ARS
+                                </div>
+                                <div style="font-size: 0.7rem; color: var(--color-muted);">
+                                    {{ expense.created_at.strftime('%d/%m/%Y') }}
+                                </div>
+                            </div>
+                            {% if not batch.is_closed %}
+                            <form method="POST"
+                                  action="{{ url_for('batches.delete_expense', batch_id=batch.id, expense_id=expense.id) }}"
+                                  onsubmit="return confirm('¿Eliminar este gasto?')">
+                                <button type="submit" class="btn btn-sm"
+                                        style="background-color: rgba(220,38,38,0.1); color: var(--color-danger); border: 1px solid rgba(220,38,38,0.2);">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <!-- Total gastos -->
+                    <div class="d-flex justify-content-between align-items-center mt-3 pt-2"
+                         style="border-top: 2px solid var(--color-border);">
+                        <span class="small fw-semibold" style="color: var(--color-text);">Total gastos</span>
+                        <div class="text-end">
+                            <div class="fw-bold" style="color: var(--color-accent-alt);">
+                                ${{ batch.total_expenses_usd|fmt }} USD
+                            </div>
+                            <div class="small" style="color: var(--color-muted);">
+                                ${{ batch.total_expenses_ars|fmt(0) }} ARS
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    {% if batch.is_closed %}
+                    <div class="text-center py-3">
+                        <p class="small mb-0" style="color: var(--color-muted);">Sin gastos registrados en este lote.</p>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Agregar ventas al lote -->
+{% if ventas_sin_lote %}
+<div class="modal fade" id="addSalesModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content border-0 rounded-4">
+            <form method="POST" action="{{ url_for('batches.add_sales', batch_id=batch.id) }}">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" style="color: var(--color-text);">
+                        <i class="bi bi-cart-plus me-2" style="color: var(--color-accent);"></i>Agregar ventas al lote
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body pt-3">
+                    <p class="small mb-3" style="color: var(--color-muted);">
+                        Seleccioná las ventas que querés incluir en <strong>{{ batch.name }}</strong>. Solo se muestran ventas sin lote asignado.
+                    </p>
+                    <!-- Seleccionar todo -->
+                    <div class="mb-2">
+                        <label class="d-flex align-items-center gap-2 small fw-medium" style="color: var(--color-text); cursor: pointer;">
+                            <input type="checkbox" id="selectAllSales" class="form-check-input">
+                            Seleccionar todas ({{ ventas_sin_lote|length }})
+                        </label>
+                    </div>
+                    <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                        <table class="table table-hover table-sm mb-0 align-middle">
+                            <thead style="background-color: var(--color-surface); position: sticky; top: 0;">
+                                <tr>
+                                    <th class="px-3 py-2" style="width: 40px;"></th>
+                                    <th class="py-2 fw-medium" style="color: var(--color-muted); font-size: 0.75rem; text-transform: uppercase;">Fecha</th>
+                                    <th class="py-2 fw-medium" style="color: var(--color-muted); font-size: 0.75rem; text-transform: uppercase;">Producto</th>
+                                    <th class="py-2 fw-medium" style="color: var(--color-muted); font-size: 0.75rem; text-transform: uppercase;">Cliente</th>
+                                    <th class="py-2 fw-medium" style="color: var(--color-muted); font-size: 0.75rem; text-transform: uppercase;">Venta USD</th>
+                                    <th class="py-2 fw-medium" style="color: var(--color-muted); font-size: 0.75rem; text-transform: uppercase;">Ganancia USD</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for sale in ventas_sin_lote %}
+                                <tr>
+                                    <td class="px-3 py-2">
+                                        <input type="checkbox" name="sale_ids" value="{{ sale.id }}"
+                                               class="form-check-input sale-checkbox">
+                                    </td>
+                                    <td class="py-2 small" style="color: var(--color-muted);">
+                                        {{ sale.created_at.strftime('%d/%m/%Y') }}
+                                    </td>
+                                    <td class="py-2 small fw-medium" style="color: var(--color-text);">
+                                        {{ sale.product.name if sale.product else 'Producto eliminado' }}
+                                    </td>
+                                    <td class="py-2 small" style="color: var(--color-muted);">
+                                        {{ sale.customer.name if sale.customer else '—' }}
+                                    </td>
+                                    <td class="py-2 small fw-semibold" style="color: var(--color-accent-alt);">
+                                        ${{ sale.sale_price_usd|fmt }}
+                                    </td>
+                                    <td class="py-2 small fw-semibold" style="color: var(--color-success);">
+                                        ${{ sale.profit_usd|fmt }}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn fw-medium" data-bs-dismiss="modal"
+                            style="background-color: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border);">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn fw-medium text-white" style="background-color: var(--color-accent);">
+                        <i class="bi bi-plus-circle me-1"></i>Agregar seleccionadas
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Modal: Eliminar lote -->
+<div class="modal fade" id="deleteBatchModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" style="color: var(--color-text);">
+                    <i class="bi bi-exclamation-triangle-fill me-2" style="color: var(--color-danger);"></i>
+                    Eliminar lote
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-3">
+                <p style="color: var(--color-muted);">
+                    ¿Eliminar el lote <strong style="color: var(--color-text);">{{ batch.name }}</strong>?
+                    Las {{ batch.sales|length }} venta(s) quedarán sin lote asignado. Los gastos se eliminarán.
+                </p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn fw-medium" data-bs-dismiss="modal"
+                        style="background-color: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border);">
+                    Cancelar
+                </button>
+                <form method="POST" action="{{ url_for('batches.delete_batch', batch_id=batch.id) }}">
+                    <button type="submit" class="btn fw-medium text-white" style="background-color: var(--color-danger);">
+                        <i class="bi bi-trash3 me-1"></i>Eliminar lote
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_scripts %}
+<script>
+// Seleccionar/deseleccionar todas las ventas del modal
+const selectAll = document.getElementById('selectAllSales');
+if (selectAll) {
+    selectAll.addEventListener('change', function () {
+        document.querySelectorAll('.sale-checkbox').forEach(cb => cb.checked = this.checked);
+    });
+}
+</script>
+{% endblock %}
+{% endblock %}

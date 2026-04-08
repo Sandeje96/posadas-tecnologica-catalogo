@@ -13,7 +13,10 @@
             </h2>
             <p class="mb-0" style="color: var(--color-muted);">{{ total_sales }} ventas registradas en total</p>
         </div>
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{{ url_for('batches.list_batches') }}" class="btn fw-medium" style="background-color: var(--color-surface); color: var(--color-primary); border: 1px solid var(--color-border);">
+                <i class="bi bi-collection me-2"></i>Lotes
+            </a>
             <a href="{{ url_for('sales.simulator') }}" class="btn fw-medium text-white" style="background-color: var(--color-accent-alt);">
                 <i class="bi bi-calculator me-2"></i>Simulador
             </a>
@@ -83,6 +86,7 @@
                             <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.78rem; text-transform: uppercase;">Ganancia USD</th>
                             <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.78rem; text-transform: uppercase;">Ganancia ARS</th>
                             <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.78rem; text-transform: uppercase;">Margen%</th>
+                            <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.78rem; text-transform: uppercase;">Lote</th>
                             <th class="pe-4 py-3 fw-medium text-end" style="color: var(--color-muted); font-size: 0.78rem; text-transform: uppercase;">Acciones</th>
                         </tr>
                     </thead>
@@ -123,6 +127,18 @@
                                       style="{% if margin >= 20 %}background-color: rgba(22,163,74,0.15); color: var(--color-success);{% elif margin >= 10 %}background-color: rgba(255,107,0,0.15); color: var(--color-accent-alt);{% else %}background-color: rgba(220,38,38,0.15); color: var(--color-danger);{% endif %} font-size: 0.7rem;">
                                     {{ margin|fmt(1) }}%
                                 </span>
+                            </td>
+                                <td class="py-3 small">
+                                {% if sale.batch %}
+                                <a href="{{ url_for('batches.batch_detail', batch_id=sale.batch.id) }}"
+                                   class="badge rounded-pill text-decoration-none"
+                                   style="background-color: rgba(0,174,239,0.15); color: var(--color-accent); font-size: 0.7rem;"
+                                   title="{{ sale.batch.name }}">
+                                    <i class="bi bi-collection me-1"></i>{{ sale.batch.name|truncate(18, True) }}
+                                </a>
+                                {% else %}
+                                <span class="small" style="color: var(--color-border);">—</span>
+                                {% endif %}
                             </td>
                             <td class="pe-4 py-3 text-end">
                                 <a href="{{ url_for('sales.edit_sale', sale_id=sale.id) }}"

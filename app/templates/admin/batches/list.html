@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}Lotes de Ventas — PosadasTecnologica Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1" style="color: var(--color-text);">
+                <i class="bi bi-collection me-2" style="color: var(--color-accent);"></i>Lotes de Ventas
+            </h2>
+            <p class="mb-0" style="color: var(--color-muted);">
+                {{ batches|length }} lote(s) registrado(s)
+                {% if sin_lote > 0 %}
+                · <span style="color: var(--color-accent-alt);">{{ sin_lote }} venta(s) sin lote</span>
+                {% endif %}
+            </p>
+        </div>
+        <button class="btn fw-medium text-white" style="background-color: var(--color-accent);"
+                data-bs-toggle="modal" data-bs-target="#newBatchModal">
+            <i class="bi bi-plus-circle me-2"></i>Nuevo Lote
+        </button>
+    </div>
+
+    {% if batches %}
+    <div class="row g-3">
+        {% for batch in batches %}
+        <div class="col-12 col-md-6 col-xl-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100 {% if batch.is_closed %}opacity-75{% endif %}">
+                <div class="card-body p-4">
+                    <!-- Nombre y estado -->
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h5 class="fw-bold mb-1" style="color: var(--color-text);">{{ batch.name }}</h5>
+                            {% if batch.description %}
+                            <p class="small mb-0" style="color: var(--color-muted);">{{ batch.description }}</p>
+                            {% endif %}
+                        </div>
+                        {% if batch.is_closed %}
+                        <span class="badge rounded-pill" style="background-color: rgba(107,114,128,0.15); color: var(--color-muted); font-size: 0.7rem;">
+                            <i class="bi bi-lock-fill me-1"></i>Cerrado
+                        </span>
+                        {% else %}
+                        <span class="badge rounded-pill" style="background-color: rgba(0,174,239,0.15); color: var(--color-accent); font-size: 0.7rem;">
+                            <i class="bi bi-unlock-fill me-1"></i>Abierto
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <div class="p-2 rounded-3" style="background-color: var(--color-surface);">
+                                <div class="small fw-medium mb-0" style="color: var(--color-muted); font-size: 0.7rem;">VENTAS</div>
+                                <div class="fw-bold" style="color: var(--color-text);">{{ batch.sales|length }}</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-2 rounded-3" style="background-color: var(--color-surface);">
+                                <div class="small fw-medium mb-0" style="color: var(--color-muted); font-size: 0.7rem;">GASTOS</div>
+                                <div class="fw-bold" style="color: var(--color-text);">{{ batch.expenses|length }}</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-2 rounded-3" style="background-color: var(--color-surface);">
+                                <div class="small fw-medium mb-0" style="color: var(--color-muted); font-size: 0.7rem;">GANANCIA</div>
+                                <div class="fw-semibold small" style="color: var(--color-success);">
+                                    ${{ batch.total_profit_usd|fmt }} USD
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-2 rounded-3" style="background-color: {% if batch.net_profit_usd >= 0 %}rgba(22,163,74,0.1){% else %}rgba(220,38,38,0.1){% endif %};">
+                                <div class="small fw-medium mb-0" style="color: var(--color-muted); font-size: 0.7rem;">NETO USD</div>
+                                <div class="fw-bold small" style="color: {% if batch.net_profit_usd >= 0 %}var(--color-success){% else %}var(--color-danger){% endif %};">
+                                    ${{ batch.net_profit_usd|fmt }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fecha -->
+                    <div class="small mb-3" style="color: var(--color-muted);">
+                        <i class="bi bi-calendar3 me-1"></i>
+                        Creado {{ batch.created_at.strftime('%d/%m/%Y') }}
+                        {% if batch.is_closed %}
+                        · Cerrado {{ batch.closed_at.strftime('%d/%m/%Y') }}
+                        {% endif %}
+                    </div>
+
+                    <a href="{{ url_for('batches.batch_detail', batch_id=batch.id) }}"
+                       class="btn btn-sm fw-medium w-100 text-white"
+                       style="background-color: var(--color-primary);">
+                        <i class="bi bi-eye me-1"></i>Ver detalle
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body text-center py-5">
+            <i class="bi bi-collection" style="font-size: 3rem; color: var(--color-border);"></i>
+            <h5 class="mt-3" style="color: var(--color-muted);">No hay lotes creados</h5>
+            <p class="small mb-3" style="color: var(--color-muted);">Crea un lote para agrupar tus ventas y controlar gastos por período.</p>
+            <button class="btn text-white" style="background-color: var(--color-accent);"
+                    data-bs-toggle="modal" data-bs-target="#newBatchModal">
+                <i class="bi bi-plus-circle me-2"></i>Crear primer lote
+            </button>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal: Nuevo Lote -->
+<div class="modal fade" id="newBatchModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4">
+            <form method="POST" action="{{ url_for('batches.new_batch') }}">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" style="color: var(--color-text);">
+                        <i class="bi bi-collection me-2" style="color: var(--color-accent);"></i>Nuevo Lote
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body pt-3">
+                    <div class="mb-3">
+                        <label class="form-label fw-medium small" style="color: var(--color-text);">Nombre del lote *</label>
+                        <input type="text" name="name" class="form-control rounded-3"
+                               placeholder="Ej: Lote Marzo 2025, Envío Semana 1..."
+                               required style="border-color: var(--color-border);">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-medium small" style="color: var(--color-text);">Descripción (opcional)</label>
+                        <textarea name="description" class="form-control rounded-3" rows="2"
+                                  placeholder="Notas sobre este lote..."
+                                  style="border-color: var(--color-border);"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn fw-medium" data-bs-dismiss="modal"
+                            style="background-color: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border);">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn fw-medium text-white" style="background-color: var(--color-accent);">
+                        <i class="bi bi-plus-circle me-1"></i>Crear lote
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
