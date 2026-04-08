@@ -1,7 +1,7 @@
 from decimal import Decimal, InvalidOperation
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from app import db
-from app.models import Product, Sale, Customer, Setting
+from app.models import Product, Sale, Customer, Setting, BatchExpense
 from app.routes.auth import login_required
 
 sales_bp = Blueprint('sales', __name__)
@@ -20,7 +20,9 @@ def list_sales():
     total_revenue_usd = sum(Decimal(str(s.sale_price_usd)) for s in all_sales)
     total_revenue_ars = sum(Decimal(str(s.sale_price_ars)) for s in all_sales)
     total_profit_usd = sum(Decimal(str(s.profit_usd)) for s in all_sales)
-    total_profit_ars = sum(Decimal(str(s.profit_ars)) for s in all_sales)
+    all_expenses = BatchExpense.query.all()
+    total_expenses_usd = sum(Decimal(str(e.amount_usd)) for e in all_expenses)
+    net_profit_usd = total_profit_usd - total_expenses_usd
 
     return render_template(
         'admin/sales/list.html',
@@ -29,8 +31,8 @@ def list_sales():
         total_sales=len(all_sales),
         total_revenue_usd=total_revenue_usd,
         total_revenue_ars=total_revenue_ars,
-        total_profit_usd=total_profit_usd,
-        total_profit_ars=total_profit_ars
+        total_expenses_usd=total_expenses_usd,
+        net_profit_usd=net_profit_usd
     )
 
 

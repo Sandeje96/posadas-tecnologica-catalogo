@@ -59,10 +59,21 @@
         <div class="col-6 col-md-3">
             <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-body p-3 text-center">
-                    <div class="small fw-medium mb-1" style="color: var(--color-muted);">Ganancia USD</div>
-                    <div class="fw-bold" style="font-size: 1.1rem; color: var(--color-success);">
-                        ${{ total_profit_usd|fmt }}
+                    <div class="small fw-medium mb-1" style="color: var(--color-muted);">Gastos (lotes)</div>
+                    <div class="fw-bold" style="font-size: 1.1rem; color: var(--color-accent-alt);">
+                        ${{ total_expenses_usd|fmt }}
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3 offset-md-9">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-3 text-center">
+                    <div class="small fw-medium mb-1" style="color: var(--color-muted);">Ganancia neta USD</div>
+                    <div class="fw-bold" style="font-size: 1.1rem; color: {% if net_profit_usd >= 0 %}var(--color-success){% else %}var(--color-danger){% endif %};">
+                        ${{ net_profit_usd|fmt }}
+                    </div>
+                    <div style="font-size: 0.7rem; color: var(--color-muted);">después de gastos</div>
                 </div>
             </div>
         </div>
