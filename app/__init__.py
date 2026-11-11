@@ -15,10 +15,13 @@ def create_app():
     config = Config()
     app.config.from_object(config)
 
-    # Fix DATABASE_URL for Railway (postgres:// -> postgresql://)
+    # Fix DATABASE_URL for Railway (postgres:// or postgresql:// -> postgresql+psycopg2://)
     db_url = app.config.get('SQLALCHEMY_DATABASE_URI', '')
-    if db_url.startswith('postgres://'):
-        app.config['SQLALCHEMY_DATABASE_URI'] = db_url.replace('postgres://', 'postgresql://', 1)
+    if db_url:
+        if db_url.startswith('postgres://'):
+            app.config['SQLALCHEMY_DATABASE_URI'] = db_url.replace('postgres://', 'postgresql+psycopg2://', 1)
+        elif db_url.startswith('postgresql://'):
+            app.config['SQLALCHEMY_DATABASE_URI'] = db_url.replace('postgresql://', 'postgresql+psycopg2://', 1)
 
     # Initialize extensions
     db.init_app(app)

@@ -15,11 +15,15 @@ class Config:
     ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin123')
     ALLOWED_EXTENSIONS = ALLOWED_EXTENSIONS
 
-    # Fix for postgres:// vs postgresql:// (Railway uses postgres://)
+    # Fix for postgres:// or postgresql:// (Railway uses postgres:// or postgresql://)
     @staticmethod
     def fix_database_url(url):
-        if url and url.startswith('postgres://'):
-            return url.replace('postgres://', 'postgresql://', 1)
+        if not url:
+            return url
+        if url.startswith('postgres://'):
+            return url.replace('postgres://', 'postgresql+psycopg2://', 1)
+        if url.startswith('postgresql://'):
+            return url.replace('postgresql://', 'postgresql+psycopg2://', 1)
         return url
 
     def __init__(self):
