@@ -138,6 +138,10 @@ def checkout():
 
         for item in items_data:
             p_id = item.get('product_id')
+            if p_id:
+                real_product = Product.query.get(p_id)
+                if not real_product:
+                    p_id = None
             p_name = item.get('product_name') or 'Producto Mundolimp'
             presentation = item.get('presentation') or 'Bidón 5 Litros'
             qty = Decimal(str(item.get('quantity', 1)))
