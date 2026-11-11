@@ -134,7 +134,7 @@ function renderCartModal() {
     const subtotal = item.price * item.quantity;
     const imgTag = item.image
       ? `<img src="/static/uploads/${item.image}" alt="${item.name}" class="rounded-3 border" style="width: 48px; height: 48px; object-fit: cover;">`
-      : `<div class="rounded-3 bg-light border d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;"><i class="bi bi-droplet text-primary"></i></div>`;
+      : `<div class="rounded-3 bg-light border d-flex align-items-center justify-content-center p-1" style="width: 48px; height: 48px;"><img src="/static/img/logo.png" alt="Mundolimp" style="width: 100%; height: 100%; object-fit: contain;"></div>`;
 
     html += `
       <div class="d-flex align-items-center justify-content-between p-2 mb-2 bg-white rounded-3 border">

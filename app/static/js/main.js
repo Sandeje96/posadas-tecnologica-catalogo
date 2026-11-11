@@ -145,8 +145,8 @@ function openProductModal(productId) {
 
       const imgHtml = data.image_filename
         ? `<img src="/static/uploads/${data.image_filename}" alt="${data.name}" class="img-fluid rounded-4 border" style="max-height: 280px; object-fit: contain; width: 100%;">`
-        : `<div class="d-flex align-items-center justify-content-center rounded-4 bg-light border" style="height: 220px;">
-             <i class="bi bi-droplet-half text-primary" style="font-size: 4rem;"></i>
+        : `<div class="d-flex align-items-center justify-content-center rounded-4 bg-light border p-3" style="height: 220px;">
+             <img src="/static/img/logo.png" alt="Mundolimp" class="img-fluid" style="max-height: 120px; object-fit: contain;">
            </div>`;
 
       const priceFormatted = Number(data.price_ars).toLocaleString('es-AR');
