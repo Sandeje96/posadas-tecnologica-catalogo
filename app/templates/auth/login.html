@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Iniciar Sesión — PosadasTecnologica{% endblock %}
+{% block title %}Iniciar Sesión — Mundolimp Admin{% endblock %}
 
 {% block content %}
 <div class="container py-5">
@@ -8,23 +8,23 @@
         <div class="col-12 col-sm-10 col-md-6 col-lg-4">
             <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
                 <!-- Card Header -->
-                <div class="card-header text-center py-4 border-0" style="background-color: var(--color-primary);">
-                    <div class="mb-3">
-                        <i class="bi bi-cpu-fill" style="font-size: 2.5rem; color: var(--color-accent);"></i>
+                <div class="card-header text-center py-4 border-0 bg-primary text-white">
+                    <div class="mb-2">
+                        <i class="bi bi-droplet-half text-info" style="font-size: 2.8rem;"></i>
                     </div>
-                    <h4 class="text-white fw-bold mb-1">PosadasTecnologica</h4>
+                    <h4 class="text-white fw-bold mb-1 letter-spacing-tight">MUNDOLIMP</h4>
                     <p class="text-white-50 mb-0 small">Panel de Administración</p>
                 </div>
 
                 <!-- Card Body -->
-                <div class="card-body p-4 p-lg-5" style="background-color: var(--color-surface);">
-                    <h5 class="fw-semibold mb-4 text-center" style="color: var(--color-text);">
-                        <i class="bi bi-lock-fill me-2" style="color: var(--color-accent);"></i>
+                <div class="card-body p-4 p-lg-5 bg-white">
+                    <h5 class="fw-bold mb-4 text-center text-dark">
+                        <i class="bi bi-lock-fill me-2 text-primary"></i>
                         Acceso Administrativo
                     </h5>
 
                     {% if error %}
-                    <div class="alert alert-danger d-flex align-items-center gap-2 mb-4" role="alert">
+                    <div class="alert alert-danger d-flex align-items-center gap-2 mb-4 rounded-3 small" role="alert">
                         <i class="bi bi-exclamation-triangle-fill"></i>
                         <span>{{ error }}</span>
                     </div>
@@ -32,47 +32,46 @@
 
                     <form method="POST" action="{{ url_for('auth.login') }}" novalidate>
                         <div class="mb-4">
-                            <label for="password" class="form-label fw-medium" style="color: var(--color-text);">
-                                Contraseña
+                            <label for="password" class="form-label fw-bold small text-dark">
+                                Contraseña de Administrador
                             </label>
                             <div class="input-group">
-                                <span class="input-group-text border-end-0" style="background-color: #fff; border-color: var(--color-border);">
-                                    <i class="bi bi-key-fill" style="color: var(--color-muted);"></i>
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="bi bi-key-fill text-muted"></i>
                                 </span>
                                 <input
                                     type="password"
-                                    class="form-control border-start-0 ps-0{% if error %} is-invalid{% endif %}"
+                                    class="form-control border-start-0 ps-0 rounded-end-3{% if error %} is-invalid{% endif %}"
                                     id="password"
                                     name="password"
-                                    placeholder="Ingresa tu contraseña"
+                                    placeholder="Ingresa la contraseña"
                                     autocomplete="current-password"
                                     autofocus
                                     required
-                                    style="border-color: var(--color-border);"
                                 >
                             </div>
                         </div>
 
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-lg fw-semibold text-white" style="background-color: var(--color-accent); border-color: var(--color-accent);">
+                            <button type="submit" class="btn btn-lg fw-bold btn-primary rounded-pill shadow-sm">
                                 <i class="bi bi-box-arrow-in-right me-2"></i>
-                                Ingresar
+                                Ingresar al Panel
                             </button>
                         </div>
                     </form>
 
                     <div class="text-center mt-4">
-                        <a href="{{ url_for('catalog.index') }}" class="text-decoration-none small" style="color: var(--color-muted);">
+                        <a href="{{ url_for('catalog.index') }}" class="text-decoration-none small text-muted">
                             <i class="bi bi-arrow-left me-1"></i>
-                            Volver al catálogo público
+                            Volver al catálogo de clientes
                         </a>
                     </div>
                 </div>
             </div>
 
-            <p class="text-center mt-3 small" style="color: var(--color-muted);">
+            <p class="text-center mt-3 small text-muted">
                 <i class="bi bi-shield-lock me-1"></i>
-                Área restringida — solo personal autorizado
+                Área de gestión para personal de Mundolimp
             </p>
         </div>
     </div>

@@ -13,9 +13,19 @@
             </h2>
             <p class="mb-0 text-muted small">{{ products|length }} productos registrados en Mundolimp</p>
         </div>
-        <a href="{{ url_for('products.new_product') }}" class="btn btn-primary rounded-pill fw-medium">
-            <i class="bi bi-plus-circle me-1"></i>Nuevo Producto
-        </a>
+        <div class="d-flex gap-2 flex-wrap">
+            <form method="POST" action="{{ url_for('products.seed_mundolimp') }}" class="d-inline">
+                <button type="submit" class="btn btn-outline-success rounded-pill fw-medium btn-sm" onclick="return confirm('¿Cargar 10 productos base de limpieza de Mundolimp en el catálogo?')">
+                    <i class="bi bi-magic me-1"></i>Cargar Productos Mundolimp
+                </button>
+            </form>
+            <button type="button" class="btn btn-outline-danger rounded-pill fw-medium btn-sm" data-bs-toggle="modal" data-bs-target="#clearCatalogModal">
+                <i class="bi bi-trash3 me-1"></i>Vaciar Catálogo Anterior
+            </button>
+            <a href="{{ url_for('products.new_product') }}" class="btn btn-primary rounded-pill fw-medium btn-sm">
+                <i class="bi bi-plus-circle me-1"></i>Nuevo Producto
+            </a>
+        </div>
     </div>
 
     <!-- Filters -->
@@ -195,6 +205,38 @@
                 <form id="deleteForm" method="POST">
                     <button type="submit" class="btn btn-danger rounded-pill">
                         <i class="bi bi-trash3 me-1"></i>Eliminar Definitivamente
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Vaciar Catálogo Anterior -->
+<div class="modal fade" id="clearCatalogModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-dark">
+                    <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Vaciar Catálogo Anterior
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-3">
+                <p class="text-dark">
+                    ¿Estás seguro que deseas eliminar <strong>todos los productos viejos</strong> (celulares, electrónica) y sus fotos?
+                </p>
+                <div class="alert alert-warning border-0 rounded-3 small">
+                    <i class="bi bi-info-circle me-1"></i> Esta acción dejará el catálogo limpio para comenzar a cargar únicamente los productos de Mundolimp. No afecta los pedidos recibidos.
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+                <form method="POST" action="{{ url_for('products.clear_old_catalog') }}">
+                    <button type="submit" class="btn btn-danger rounded-pill fw-bold">
+                        <i class="bi bi-trash3 me-1"></i>Sí, Vaciar Catálogo
                     </button>
                 </form>
             </div>
