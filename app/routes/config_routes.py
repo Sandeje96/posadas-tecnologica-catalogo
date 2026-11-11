@@ -14,10 +14,13 @@ def config():
             whatsapp = request.form.get('whatsapp_number', '').strip()
             min_order = request.form.get('minimum_order', '0').strip()
             announcement = request.form.get('announcement', '').strip()
+            new_password = request.form.get('admin_password', '').strip()
 
             Setting.set('whatsapp_number', whatsapp)
             Setting.set('minimum_order', min_order or '0')
             Setting.set('announcement', announcement)
+            if new_password:
+                Setting.set('admin_password', new_password)
 
             flash('Configuración de la tienda Mundolimp actualizada exitosamente.', 'success')
             return redirect(url_for('config_bp.config'))
