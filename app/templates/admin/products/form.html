@@ -1,111 +1,53 @@
 {% extends 'base.html' %}
 
-{% block title %}{% if product %}Editar Producto{% else %}Nuevo Producto{% endif %} — PosadasTecnologica Admin{% endblock %}
+{% block title %}{% if product %}Editar Producto{% else %}Nuevo Producto{% endif %} — Mundolimp Admin{% endblock %}
 
 {% block content %}
 <div class="container-fluid px-4 py-4">
 
     <!-- Header -->
     <div class="d-flex align-items-center gap-3 mb-4">
-        <a href="{{ url_for('products.list_products') }}" class="btn btn-sm" style="color: var(--color-primary); background-color: var(--color-surface); border: 1px solid var(--color-border);">
+        <a href="{{ url_for('products.list_products') }}" class="btn btn-outline-secondary rounded-pill btn-sm">
             <i class="bi bi-arrow-left me-1"></i>Volver
         </a>
         <div>
-            <h2 class="fw-bold mb-0" style="color: var(--color-text);">
-                <i class="bi bi-{% if product %}pencil-square{% else %}plus-circle{% endif %} me-2" style="color: var(--color-accent);"></i>
+            <h2 class="fw-bold mb-0 text-dark">
+                <i class="bi bi-{% if product %}pencil-square{% else %}plus-circle{% endif %} text-primary me-2"></i>
                 {% if product %}Editar Producto{% else %}Nuevo Producto{% endif %}
             </h2>
+            <p class="text-muted small mb-0">Catálogo de productos de limpieza Mundolimp</p>
         </div>
     </div>
 
     <form method="POST" enctype="multipart/form-data" id="productForm">
         <div class="row g-4">
 
-            <!-- Main Info -->
+            <!-- Columna Principal -->
             <div class="col-lg-8">
                 <div class="card border-0 shadow-sm rounded-4 mb-4">
                     <div class="card-header border-0 bg-white rounded-top-4 py-3 px-4">
-                        <h6 class="fw-semibold mb-0" style="color: var(--color-text);">
-                            <i class="bi bi-info-circle me-2" style="color: var(--color-accent);"></i>
+                        <h6 class="fw-bold mb-0 text-dark">
+                            <i class="bi bi-info-circle text-primary me-2"></i>
                             Información del Producto
                         </h6>
                     </div>
                     <div class="card-body p-4">
+                        <!-- Nombre -->
                         <div class="mb-3">
-                            <label class="form-label fw-medium" style="color: var(--color-text);">
-                                Nombre del producto <span class="text-danger">*</span>
+                            <label class="form-label fw-bold small text-dark">
+                                Nombre del Producto <span class="text-danger">*</span>
                             </label>
-                            <input type="text" class="form-control" name="name"
+                            <input type="text" class="form-control rounded-3" name="name"
                                    value="{{ product.name if product else '' }}"
-                                   placeholder="Ej: iPhone 15 Pro Max 256GB"
-                                   required style="border-color: var(--color-border);">
+                                   placeholder="Ej: Lavandina Concentrada 55g/l, Detergente Ultra Desengrasante..."
+                                   required>
                         </div>
 
-                        <div class="row g-3">
+                        <!-- Categoría y Presentación -->
+                        <div class="row g-3 mb-3">
                             <div class="col-md-6">
-                                <label class="form-label fw-medium" style="color: var(--color-text);">Marca</label>
-                                <input type="text" class="form-control" name="brand"
-                                       value="{{ product.brand if product else '' }}"
-                                       placeholder="Ej: Apple, Samsung, HP..."
-                                       style="border-color: var(--color-border);">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-medium" style="color: var(--color-text);">Modelo</label>
-                                <input type="text" class="form-control" name="model"
-                                       value="{{ product.model if product else '' }}"
-                                       placeholder="Ej: 15 Pro Max, Galaxy S24..."
-                                       style="border-color: var(--color-border);">
-                            </div>
-                        </div>
-
-                        <div class="mt-3">
-                            <label class="form-label fw-medium" style="color: var(--color-text);">Descripción</label>
-                            <textarea class="form-control" name="description" rows="4"
-                                      placeholder="Descripción detallada del producto, características, especificaciones..."
-                                      style="border-color: var(--color-border);">{{ product.description if product else '' }}</textarea>
-                        </div>
-
-                        <!-- Características Smartphone -->
-                        <div class="mt-3 p-3 rounded-3" style="background-color: var(--color-surface); border: 1px solid var(--color-border);">
-                            <p class="fw-semibold small mb-3" style="color: var(--color-primary);">
-                                <i class="bi bi-phone me-1" style="color: var(--color-accent);"></i>
-                                Características del Smartphone
-                            </p>
-                            <div class="row g-3">
-                                <div class="col-md-4">
-                                    <label class="form-label fw-medium small" style="color: var(--color-text);">
-                                        <i class="bi bi-memory me-1" style="color: var(--color-accent);"></i>Memoria RAM
-                                    </label>
-                                    <input type="text" class="form-control form-control-sm" name="ram"
-                                           value="{{ product.ram if product and product.ram else '' }}"
-                                           placeholder="Ej: 8 GB"
-                                           style="border-color: var(--color-border);">
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-medium small" style="color: var(--color-text);">
-                                        <i class="bi bi-device-hdd me-1" style="color: var(--color-accent);"></i>Almacenamiento
-                                    </label>
-                                    <input type="text" class="form-control form-control-sm" name="storage"
-                                           value="{{ product.storage if product and product.storage else '' }}"
-                                           placeholder="Ej: 256 GB"
-                                           style="border-color: var(--color-border);">
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-medium small" style="color: var(--color-text);">
-                                        <i class="bi bi-palette me-1" style="color: var(--color-accent);"></i>Color
-                                    </label>
-                                    <input type="text" class="form-control form-control-sm" name="color"
-                                           value="{{ product.color if product and product.color else '' }}"
-                                           placeholder="Ej: Negro"
-                                           style="border-color: var(--color-border);">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row g-3 mt-0">
-                            <div class="col-md-6">
-                                <label class="form-label fw-medium" style="color: var(--color-text);">Categoría</label>
-                                <select class="form-select" name="category" style="border-color: var(--color-border);">
+                                <label class="form-label fw-bold small text-dark">Categoría <span class="text-danger">*</span></label>
+                                <select class="form-select rounded-3" name="category" required>
                                     {% for cat in categories %}
                                     <option value="{{ cat }}" {% if product and product.category == cat %}selected{% endif %}>
                                         {{ cat }}
@@ -114,144 +56,114 @@
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-medium" style="color: var(--color-text);">Badge / Etiqueta</label>
-                                <select class="form-select" name="badge" style="border-color: var(--color-border);">
-                                    <option value="" {% if not product or not product.badge %}selected{% endif %}>Sin etiqueta</option>
-                                    <option value="nuevo" {% if product and product.badge == 'nuevo' %}selected{% endif %}>⭐ Nuevo</option>
-                                    <option value="mas-vendido" {% if product and product.badge == 'mas-vendido' %}selected{% endif %}>🔥 Más vendido</option>
-                                    <option value="oferta" {% if product and product.badge == 'oferta' %}selected{% endif %}>🏷️ Oferta</option>
+                                <label class="form-label fw-bold small text-dark">Presentación Habitual</label>
+                                <select class="form-select rounded-3" name="presentation">
+                                    {% for pres in presentaciones %}
+                                    <option value="{{ pres }}" {% if product and (product.presentation == pres or (not product.presentation and pres == 'Bidón 5 Litros')) %}selected{% endif %}>
+                                        {{ pres }}
+                                    </option>
+                                    {% endfor %}
                                 </select>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <!-- Pricing Card -->
-                <div class="card border-0 shadow-sm rounded-4">
-                    <div class="card-header border-0 bg-white rounded-top-4 py-3 px-4">
-                        <h6 class="fw-semibold mb-0" style="color: var(--color-text);">
-                            <i class="bi bi-currency-dollar me-2" style="color: var(--color-accent-alt);"></i>
-                            Precios y Costos (USD)
-                        </h6>
-                    </div>
-                    <div class="card-body p-4">
-                        <div class="row g-3">
+                        <!-- Precio en ARS y Badge -->
+                        <div class="row g-3 mb-3">
                             <div class="col-md-6">
-                                <label class="form-label fw-medium" style="color: var(--color-text);">
-                                    Precio de Costo (USD)
+                                <label class="form-label fw-bold small text-dark">
+                                    Precio de Venta ($ ARS) <span class="text-danger">*</span>
                                 </label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-white" style="border-color: var(--color-border);">
-                                        <i class="bi bi-currency-dollar" style="color: var(--color-muted);"></i>
-                                    </span>
-                                    <input type="number" class="form-control" name="cost_price_usd" id="costPrice"
-                                           value="{{ product.cost_price_usd if product else '0' }}"
-                                           step="0.01" min="0" placeholder="0.00"
-                                           style="border-color: var(--color-border);">
+                                    <span class="input-group-text bg-light fw-bold text-success">$</span>
+                                    <input type="number" class="form-control rounded-end-3 fw-bold fs-5 text-dark" name="price"
+                                           value="{{ product.price|int if product and product.price else (product.sale_price_usd|int if product else '0') }}"
+                                           step="1" min="0" placeholder="0" required>
                                 </div>
+                                <div class="form-text small text-muted">Precio final visible al cliente en el catálogo.</div>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-medium" style="color: var(--color-text);">
-                                    Precio de Venta (USD)
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-white" style="border-color: var(--color-border);">
-                                        <i class="bi bi-currency-dollar" style="color: var(--color-accent-alt);"></i>
-                                    </span>
-                                    <input type="number" class="form-control fw-bold" name="sale_price_usd" id="salePrice"
-                                           value="{{ product.sale_price_usd if product else '0' }}"
-                                           step="0.01" min="0" placeholder="0.00"
-                                           style="border-color: var(--color-border); color: var(--color-accent-alt);">
-                                </div>
+                                <label class="form-label fw-bold small text-dark">Etiqueta Promocional (Opcional)</label>
+                                <select class="form-select rounded-3" name="badge">
+                                    <option value="" {% if not product or not product.badge %}selected{% endif %}>Sin etiqueta</option>
+                                    <option value="mas-vendido" {% if product and product.badge == 'mas-vendido' %}selected{% endif %}>🔥 Más vendido</option>
+                                    <option value="oferta" {% if product and product.badge == 'oferta' %}selected{% endif %}>🏷️ En Oferta</option>
+                                    <option value="nuevo" {% if product and product.badge == 'nuevo' %}selected{% endif %}>⭐ Nuevo Lanzamiento</option>
+                                </select>
                             </div>
                         </div>
 
-                        <!-- Live Profit Calculation -->
-                        <div class="mt-4 p-3 rounded-3" style="background-color: var(--color-surface); border: 1px solid var(--color-border);">
-                            <div class="row text-center g-3">
-                                <div class="col-4">
-                                    <div class="small" style="color: var(--color-muted);">Ganancia USD</div>
-                                    <div class="fw-bold" id="profitUsd" style="color: var(--color-success);">$0.00</div>
-                                </div>
-                                <div class="col-4">
-                                    <div class="small" style="color: var(--color-muted);">Margen</div>
-                                    <div class="fw-bold" id="marginPercent" style="color: var(--color-accent);">0%</div>
-                                </div>
-                                <div class="col-4">
-                                    <div class="small" style="color: var(--color-muted);">Estado</div>
-                                    <div class="fw-bold" id="marginStatus">—</div>
-                                </div>
-                            </div>
+                        <!-- Descripción -->
+                        <div>
+                            <label class="form-label fw-bold small text-dark">Descripción / Modo de Uso</label>
+                            <textarea class="form-control rounded-3" name="description" rows="4"
+                                      placeholder="Detalles sobre el producto, fragancia, dilución recomendada, rendimiento...">{{ product.description if product else '' }}</textarea>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column: Image + Stock -->
+            <!-- Columna Lateral: Foto y Disponibilidad -->
             <div class="col-lg-4">
-                <!-- Image Upload -->
+                <!-- Imagen -->
                 <div class="card border-0 shadow-sm rounded-4 mb-4">
                     <div class="card-header border-0 bg-white rounded-top-4 py-3 px-4">
-                        <h6 class="fw-semibold mb-0" style="color: var(--color-text);">
-                            <i class="bi bi-image me-2" style="color: var(--color-accent);"></i>
-                            Imagen del Producto
+                        <h6 class="fw-bold mb-0 text-dark">
+                            <i class="bi bi-image text-primary me-2"></i>
+                            Foto del Producto
                         </h6>
                     </div>
                     <div class="card-body p-4">
-                        <!-- Image Preview -->
                         <div class="image-upload-preview mb-3" id="imagePreview">
                             {% if product and product.image_filename %}
                             <img src="{{ url_for('static', filename='uploads/' + product.image_filename) }}"
                                  alt="Vista previa" id="previewImg" class="img-preview-shown">
                             {% else %}
                             <div class="img-preview-placeholder" id="previewPlaceholder">
-                                <i class="bi bi-cloud-upload"></i>
-                                <span>Haz clic para subir imagen</span>
-                                <span class="small" style="color: var(--color-muted);">PNG, JPG, WEBP hasta 16MB</span>
+                                <i class="bi bi-cloud-upload text-primary fs-2"></i>
+                                <span class="fw-medium text-dark">Clic para subir foto</span>
+                                <span class="small text-muted">PNG, JPG, WEBP</span>
                             </div>
                             <img src="" alt="Vista previa" id="previewImg" style="display:none;" class="img-preview-shown">
                             {% endif %}
                         </div>
 
-                        <input type="file" class="form-control" name="image" id="imageInput"
-                               accept=".png,.jpg,.jpeg,.gif,.webp"
-                               style="border-color: var(--color-border);">
-                        <div class="form-text" style="color: var(--color-muted);">
-                            Formatos: PNG, JPG, GIF, WEBP
+                        <input type="file" class="form-control rounded-3" name="image" id="imageInput"
+                               accept=".png,.jpg,.jpeg,.gif,.webp">
+                        <div class="form-text small text-muted">
+                            Se recomienda imagen cuadrada o con fondo blanco.
                         </div>
                     </div>
                 </div>
 
-                <!-- Stock -->
-                <div class="card border-0 shadow-sm rounded-4">
+                <!-- Disponibilidad -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
                     <div class="card-body p-4">
-                        <h6 class="fw-semibold mb-3" style="color: var(--color-text);">
-                            <i class="bi bi-boxes me-2" style="color: var(--color-accent);"></i>
+                        <h6 class="fw-bold mb-3 text-dark">
+                            <i class="bi bi-toggle-on text-primary me-2"></i>
                             Disponibilidad
                         </h6>
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" id="stockCheck" name="stock"
                                    {% if not product or product.stock %}checked{% endif %}
-                                   style="width: 3em; height: 1.5em;">
-                            <label class="form-check-label fw-medium ms-2" for="stockCheck" style="color: var(--color-text);">
-                                Disponible en stock
+                                   style="width: 2.8em; height: 1.4em;">
+                            <label class="form-check-label fw-bold ms-2 text-dark" for="stockCheck">
+                                Disponible para pedidos
                             </label>
                         </div>
-                        <p class="small mt-2 mb-0" style="color: var(--color-muted);">
-                            Si está desactivado, el producto aparecerá como "Sin stock" en el catálogo.
+                        <p class="small text-muted mt-2 mb-0">
+                            Si está desmarcado, se mostrará como "Sin stock" y los clientes no podrán agregarlo al pedido.
                         </p>
                     </div>
                 </div>
 
-                <!-- Submit Buttons -->
-                <div class="mt-4 d-grid gap-2">
-                    <button type="submit" class="btn fw-semibold text-white py-3" style="background-color: var(--color-accent);">
-                        <i class="bi bi-check-circle me-2"></i>
-                        {% if product %}Guardar Cambios{% else %}Crear Producto{% endif %}
+                <!-- Acciones -->
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary rounded-pill py-2 fw-bold fs-6">
+                        <i class="bi bi-check-circle me-1"></i>
+                        {% if product %}Guardar Cambios{% else %}Publicar Producto{% endif %}
                     </button>
-                    <a href="{{ url_for('products.list_products') }}" class="btn fw-medium"
-                       style="background-color: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border);">
-                        <i class="bi bi-x-circle me-2"></i>Cancelar
+                    <a href="{{ url_for('products.list_products') }}" class="btn btn-outline-secondary rounded-pill py-2">
+                        Cancelar
                     </a>
                 </div>
             </div>

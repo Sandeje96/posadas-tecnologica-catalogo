@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}Pedidos Web — Mundolimp Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <div>
+            <h2 class="fw-bold mb-1 text-dark">
+                <i class="bi bi-inbox-fill text-primary me-2"></i> Pedidos Web Recibidos
+            </h2>
+            <p class="text-muted small mb-0">
+                Pedidos realizados por clientes a través del catálogo online.
+            </p>
+        </div>
+        <div>
+            <a href="{{ url_for('catalog.index') }}" target="_blank" class="btn btn-outline-primary rounded-pill">
+                <i class="bi bi-shop me-1"></i> Ver Catálogo Online
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-light">
+                <span class="text-muted small text-uppercase fw-bold">Total Pedidos</span>
+                <h3 class="fw-bold text-dark mb-0">{{ total_pedidos }}</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-warning-subtle border-warning-subtle">
+                <span class="text-warning-emphasis small text-uppercase fw-bold">Pendientes de Confirmar</span>
+                <h3 class="fw-bold text-warning-emphasis mb-0">{{ pedidos_pendientes }}</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-success-subtle border-success-subtle">
+                <span class="text-success small text-uppercase fw-bold">Confirmados</span>
+                <h3 class="fw-bold text-success mb-0">{{ pedidos_confirmados }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-3">
+            <form method="GET" action="{{ url_for('orders.list_orders') }}" class="row g-2 align-items-center">
+                <div class="col-md-4">
+                    <input type="text" name="buscar" class="form-control form-control-sm rounded-pill"
+                           placeholder="Buscar por cliente, teléfono, dirección..." value="{{ buscar }}">
+                </div>
+                <div class="col-md-3">
+                    <select name="estado" class="form-select form-select-sm rounded-pill">
+                        <option value="todos" {% if not estado_filtro or estado_filtro == 'todos' %}selected{% endif %}>Todos los estados</option>
+                        <option value="pendiente" {% if estado_filtro == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                        <option value="confirmado" {% if estado_filtro == 'confirmado' %}selected{% endif %}>Confirmado</option>
+                        <option value="en_camino" {% if estado_filtro == 'en_camino' %}selected{% endif %}>En camino</option>
+                        <option value="entregado" {% if estado_filtro == 'entregado' %}selected{% endif %}>Entregado</option>
+                        <option value="cancelado" {% if estado_filtro == 'cancelado' %}selected{% endif %}>Cancelado</option>
+                    </select>
+                </div>
+                <div class="col-md-auto">
+                    <button type="submit" class="btn btn-sm btn-dark rounded-pill px-3">
+                        <i class="bi bi-filter me-1"></i> Filtrar
+                    </button>
+                    {% if buscar or (estado_filtro and estado_filtro != 'todos') %}
+                    <a href="{{ url_for('orders.list_orders') }}" class="btn btn-sm btn-outline-secondary rounded-pill ms-1">
+                        Limpiar
+                    </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla de Pedidos -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">N° Pedido</th>
+                        <th>Fecha</th>
+                        <th>Cliente / Comercio</th>
+                        <th>Contacto</th>
+                        <th>Entrega</th>
+                        <th class="text-end">Total ($)</th>
+                        <th class="text-center">Estado</th>
+                        <th class="text-end pe-4">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td class="ps-4 fw-bold text-primary">{{ order.order_number }}</td>
+                        <td class="small text-muted">{{ order.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td class="fw-semibold text-dark">{{ order.customer_name }}</td>
+                        <td class="small"><i class="bi bi-telephone text-muted me-1"></i>{{ order.customer_phone }}</td>
+                        <td class="small text-muted">
+                            <i class="bi bi-geo-alt me-1"></i>{{ order.customer_address }}
+                            {% if order.customer_city %} · {{ order.customer_city }}{% endif %}
+                        </td>
+                        <td class="text-end fw-bold text-success">${{ order.total_amount|fmt }}</td>
+                        <td class="text-center">
+                            {% if order.status == 'pendiente' %}
+                            <span class="badge bg-warning text-dark rounded-pill px-2 py-1">Pendiente</span>
+                            {% elif order.status == 'confirmado' %}
+                            <span class="badge bg-primary rounded-pill px-2 py-1">Confirmado</span>
+                            {% elif order.status == 'en_camino' %}
+                            <span class="badge bg-info text-dark rounded-pill px-2 py-1">En camino</span>
+                            {% elif order.status == 'entregado' %}
+                            <span class="badge bg-success rounded-pill px-2 py-1">Entregado</span>
+                            {% elif order.status == 'cancelado' %}
+                            <span class="badge bg-danger rounded-pill px-2 py-1">Cancelado</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end pe-4">
+                            <a href="{{ url_for('orders.view_order', order_id=order.id) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                <i class="bi bi-eye me-1"></i> Ver Detalle
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox fs-1 d-block mb-2 text-muted"></i>
+                            No hay pedidos web registrados en este criterio.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,18 +1,19 @@
 /* ============================================================
-   PosadasTecnologica — Custom Stylesheet
+   Mundolimp — Custom Stylesheet
    Brand Colors & UI Components
    ============================================================ */
 
 /* --- CSS Custom Properties (Brand Colors) --- */
 :root {
   --color-bg: #FFFFFF;
-  --color-surface: #F4F6F9;
-  --color-primary: #0A2E5C;
-  --color-accent: #00AEEF;
-  --color-accent-alt: #FF6B00;
-  --color-text: #1A1A2E;
-  --color-muted: #6B7280;
-  --color-border: #E5E7EB;
+  --color-surface: #F8FAFC;
+  --color-primary: #0369A1;
+  --color-primary-dark: #075985;
+  --color-accent: #0284C7;
+  --color-accent-alt: #0D9488;
+  --color-text: #0F172A;
+  --color-muted: #64748B;
+  --color-border: #E2E8F0;
   --color-success: #16A34A;
   --color-danger: #DC2626;
 
@@ -461,3 +462,49 @@ h1, h2, h3, h4, h5, h6 {
 .table td, .table th {
   vertical-align: middle;
 }
+
+/* --- Hero Banner --- */
+.hero-banner {
+  background: linear-gradient(135deg, #0369a1 0%, #0284c7 60%, #0ea5e9 100%);
+}
+
+/* --- Sticky Filter Bar --- */
+.sticky-filter-bar {
+  position: sticky;
+  top: 56px;
+  z-index: 1020;
+}
+
+.category-filter-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.category-filter-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* --- Floating Cart --- */
+.floating-cart-wrapper {
+  animation: slideUpCart 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUpCart {
+  from {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.letter-spacing-tight {
+  letter-spacing: -0.03em;
+}
+

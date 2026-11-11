@@ -11,28 +11,27 @@ config_bp = Blueprint('config_bp', __name__)
 def config():
     if request.method == 'POST':
         try:
-            exchange_rate_str = request.form.get('exchange_rate', '').strip()
-            if not exchange_rate_str:
-                flash('El tipo de cambio no puede estar vacío.', 'danger')
-                return redirect(url_for('config_bp.config'))
+            whatsapp = request.form.get('whatsapp_number', '').strip()
+            min_order = request.form.get('minimum_order', '0').strip()
+            announcement = request.form.get('announcement', '').strip()
 
-            exchange_rate = Decimal(exchange_rate_str)
-            if exchange_rate <= 0:
-                flash('El tipo de cambio debe ser un valor positivo.', 'danger')
-                return redirect(url_for('config_bp.config'))
+            Setting.set('whatsapp_number', whatsapp)
+            Setting.set('minimum_order', min_order or '0')
+            Setting.set('announcement', announcement)
 
-            Setting.set('exchange_rate', str(exchange_rate))
-            flash(f'Tipo de cambio actualizado exitosamente: USD 1 = ARS {exchange_rate:,.2f}', 'success')
+            flash('Configuración de la tienda Mundolimp actualizada exitosamente.', 'success')
             return redirect(url_for('config_bp.config'))
 
-        except InvalidOperation:
-            flash('Por favor ingresa un valor numérico válido para el tipo de cambio.', 'danger')
         except Exception as e:
             flash(f'Error al guardar la configuración: {str(e)}', 'danger')
 
-    try:
-        exchange_rate = Decimal(Setting.get('exchange_rate', '1000'))
-    except Exception:
-        exchange_rate = Decimal('1000')
+    whatsapp_number = Setting.get('whatsapp_number', '')
+    minimum_order = Setting.get('minimum_order', '0')
+    announcement = Setting.get('announcement', 'Venta Directa de Fábrica · Envíos a Domicilio y Comercios')
 
-    return render_template('admin/config.html', exchange_rate=exchange_rate)
+    return render_template(
+        'admin/config.html',
+        whatsapp_number=whatsapp_number,
+        minimum_order=minimum_order,
+        announcement=announcement
+    )

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}PosadasTecnologica{% endblock %}</title>
+    <title>{% block title %}Mundolimp — Catálogo de Productos de Limpieza{% endblock %}</title>
 
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,9 +12,6 @@
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
 
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
@@ -27,79 +24,66 @@
 <body>
 
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: var(--color-primary);">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm py-2">
     <div class="container-fluid px-4">
         <!-- Brand -->
-        <a class="navbar-brand d-flex align-items-center" href="{{ url_for('catalog.index') }}">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="PosadasTecnologica" style="height: 48px; width: auto;">
+        <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="{{ url_for('catalog.index') }}">
+            <i class="bi bi-droplet-half fs-3 text-info"></i>
+            <div>
+                <span class="fs-4 text-white letter-spacing-tight">MUNDOLIMP</span>
+                <span class="d-none d-sm-inline-block badge bg-info text-dark rounded-pill ms-2 small">Productos de Limpieza</span>
+            </div>
         </a>
 
-        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+        <div class="d-flex align-items-center gap-2 order-lg-last">
+            <!-- Botón Carrito en Navbar para Móvil y Desktop -->
+            {% if not session.get('admin') %}
+            <button class="btn btn-warning rounded-pill px-3 py-2 fw-bold text-dark d-flex align-items-center gap-2 shadow-sm nav-cart-btn" onclick="openCartModal()">
+                <i class="bi bi-cart3 fs-5"></i>
+                <span class="d-none d-sm-inline">Mi Pedido</span>
+                <span class="badge bg-dark text-white rounded-pill cart-count-badge">0</span>
+            </button>
+            {% endif %}
+
+            <button class="navbar-toggler border-0 ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
 
         <div class="collapse navbar-collapse" id="mainNavbar">
-            <ul class="navbar-nav me-auto">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('catalog.index') }}">
-                        <i class="bi bi-grid me-1"></i>Catálogo
+                    <a class="nav-link text-white fw-medium" href="{{ url_for('catalog.index') }}">
+                        <i class="bi bi-grid me-1"></i> Catálogo
                     </a>
                 </li>
                 {% if session.get('admin') %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('admin.dashboard') }}">
-                        <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                    <a class="nav-link text-white fw-medium" href="{{ url_for('admin.dashboard') }}">
+                        <i class="bi bi-speedometer2 me-1"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white fw-medium" href="{{ url_for('orders.list_orders') }}">
+                        <i class="bi bi-inbox me-1"></i> Pedidos Web
                     </a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                        <i class="bi bi-box-seam me-1"></i>Productos
+                    <a class="nav-link dropdown-toggle text-white fw-medium" href="#" data-bs-toggle="dropdown">
+                        <i class="bi bi-box-seam me-1"></i> Productos
                     </a>
                     <ul class="dropdown-menu dropdown-menu-dark">
                         <li><a class="dropdown-item" href="{{ url_for('products.list_products') }}">
-                            <i class="bi bi-list-ul me-2"></i>Ver todos
+                            <i class="bi bi-list-ul me-2"></i> Ver Catálogo
                         </a></li>
                         <li><a class="dropdown-item" href="{{ url_for('products.new_product') }}">
-                            <i class="bi bi-plus-circle me-2"></i>Agregar producto
-                        </a></li>
-                    </ul>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                        <i class="bi bi-cart-check me-1"></i>Ventas
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-dark">
-                        <li><a class="dropdown-item" href="{{ url_for('sales.list_sales') }}">
-                            <i class="bi bi-list-ul me-2"></i>Ver ventas
-                        </a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('sales.new_sale') }}">
-                            <i class="bi bi-plus-circle me-2"></i>Registrar venta
-                        </a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('sales.simulator') }}">
-                            <i class="bi bi-calculator me-2"></i>Simulador
-                        </a></li>
-                        <li><hr class="dropdown-divider" style="border-color: rgba(255,255,255,0.1);"></li>
-                        <li><a class="dropdown-item" href="{{ url_for('batches.list_batches') }}">
-                            <i class="bi bi-collection me-2"></i>Lotes de ventas
-                        </a></li>
-                    </ul>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                        <i class="bi bi-people me-1"></i>Clientes
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-dark">
-                        <li><a class="dropdown-item" href="{{ url_for('customers.list_customers') }}">
-                            <i class="bi bi-list-ul me-2"></i>Ver clientes
-                        </a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('customers.new_customer') }}">
-                            <i class="bi bi-person-plus me-2"></i>Nuevo cliente
+                            <i class="bi bi-plus-circle me-2"></i> Agregar Producto
                         </a></li>
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('config_bp.config') }}">
-                        <i class="bi bi-gear me-1"></i>Configuración
+                    <a class="nav-link text-white fw-medium" href="{{ url_for('config_bp.config') }}">
+                        <i class="bi bi-gear me-1"></i> Configuración
                     </a>
                 </li>
                 {% endif %}
@@ -108,14 +92,14 @@
             <ul class="navbar-nav ms-auto">
                 {% if session.get('admin') %}
                 <li class="nav-item">
-                    <a class="nav-link text-warning" href="{{ url_for('auth.logout') }}">
-                        <i class="bi bi-box-arrow-right me-1"></i>Cerrar sesión
+                    <a class="nav-link text-warning-emphasis fw-medium" href="{{ url_for('auth.logout') }}">
+                        <i class="bi bi-box-arrow-right me-1"></i> Cerrar sesión
                     </a>
                 </li>
                 {% elif not public_view %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('auth.login') }}">
-                        <i class="bi bi-lock me-1"></i>Admin
+                    <a class="nav-link text-white-50 small" href="{{ url_for('auth.login') }}">
+                        <i class="bi bi-lock me-1"></i> Admin
                     </a>
                 </li>
                 {% endif %}
@@ -129,12 +113,12 @@
 {% if messages %}
 <div class="container-fluid px-4 mt-3">
     {% for category, message in messages %}
-    <div class="alert alert-{{ 'danger' if category == 'danger' else ('success' if category == 'success' else ('warning' if category == 'warning' else 'info')) }} alert-dismissible fade show d-flex align-items-center gap-2" role="alert">
+    <div class="alert alert-{{ 'danger' if category == 'danger' else ('success' if category == 'success' else ('warning' if category == 'warning' else 'info')) }} alert-dismissible fade show d-flex align-items-center gap-2 shadow-sm rounded-4" role="alert">
         {% if category == 'success' %}<i class="bi bi-check-circle-fill"></i>
         {% elif category == 'danger' %}<i class="bi bi-exclamation-triangle-fill"></i>
         {% elif category == 'warning' %}<i class="bi bi-exclamation-circle-fill"></i>
         {% else %}<i class="bi bi-info-circle-fill"></i>{% endif %}
-        {{ message }}
+        <div>{{ message }}</div>
         <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
     </div>
     {% endfor %}
@@ -148,19 +132,18 @@
 </main>
 
 <!-- Footer -->
-<footer class="footer mt-auto py-4" style="background-color: var(--color-primary); color: rgba(255,255,255,0.7);">
+<footer class="footer mt-auto py-4 bg-dark text-white-50">
     <div class="container-fluid px-4">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <span class="fw-semibold text-white">
-                    <i class="bi bi-cpu-fill me-1" style="color: var(--color-accent);"></i>
-                    PosadasTecnologica
+        <div class="row align-items-center gy-3">
+            <div class="col-md-6 text-center text-md-start">
+                <span class="fw-bold text-white fs-5">
+                    <i class="bi bi-droplet-half text-info me-1"></i> MUNDOLIMP
                 </span>
-                <span class="ms-2">— Tecnología al mejor precio</span>
+                <span class="ms-2 small">— Fábrica de Productos de Limpieza & Artículos del Hogar</span>
             </div>
-            <div class="col-md-6 text-md-end mt-2 mt-md-0">
-                <small>
-                    <i class="bi bi-geo-alt me-1"></i>Posadas, Misiones, Argentina
+            <div class="col-md-6 text-center text-md-end">
+                <small class="text-white-50">
+                    <i class="bi bi-truck me-1 text-info"></i> Envíos a Domicilio y Venta Directa
                 </small>
             </div>
         </div>
@@ -170,7 +153,10 @@
 <!-- Bootstrap 5 JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Custom JS -->
+<!-- Shopping Cart JS (for catalog & checkout) -->
+<script src="{{ url_for('static', filename='js/cart.js') }}"></script>
+
+<!-- Main JS -->
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 
 {% block extra_scripts %}{% endblock %}

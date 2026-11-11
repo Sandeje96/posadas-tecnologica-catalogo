@@ -1,26 +1,29 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard — PosadasTecnologica Admin{% endblock %}
+{% block title %}Dashboard — Mundolimp Admin{% endblock %}
 
 {% block content %}
 <div class="container-fluid px-4 py-4">
 
     <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
         <div>
-            <h2 class="fw-bold mb-1" style="color: var(--color-text);">
-                <i class="bi bi-speedometer2 me-2" style="color: var(--color-accent);"></i>Dashboard
+            <h2 class="fw-bold mb-1 text-dark">
+                <i class="bi bi-speedometer2 text-primary me-2"></i>Panel de Control Mundolimp
             </h2>
-            <p class="mb-0" style="color: var(--color-muted);">
-                {{ now.strftime('%B %Y') }} — Resumen general
+            <p class="mb-0 text-muted small">
+                Gestión de productos de limpieza y pedidos web entrantes
             </p>
         </div>
         <div class="d-flex gap-2">
-            <a href="{{ url_for('products.new_product') }}" class="btn btn-sm text-white" style="background-color: var(--color-accent);">
+            <a href="{{ url_for('products.new_product') }}" class="btn btn-primary rounded-pill btn-sm fw-medium px-3">
                 <i class="bi bi-plus-circle me-1"></i>Nuevo Producto
             </a>
-            <a href="{{ url_for('sales.new_sale') }}" class="btn btn-sm text-white" style="background-color: var(--color-success);">
-                <i class="bi bi-cart-plus me-1"></i>Registrar Venta
+            <a href="{{ url_for('orders.list_orders') }}" class="btn btn-outline-primary rounded-pill btn-sm fw-medium px-3">
+                <i class="bi bi-inbox me-1"></i>Ver Pedidos Web
+            </a>
+            <a href="{{ url_for('catalog.index') }}" target="_blank" class="btn btn-outline-dark rounded-pill btn-sm fw-medium px-3">
+                <i class="bi bi-shop me-1"></i>Ver Catálogo
             </a>
         </div>
     </div>
@@ -29,207 +32,140 @@
     <div class="row g-4 mb-4">
         <!-- Total Products -->
         <div class="col-6 col-lg-3">
-            <div class="card border-0 shadow-sm rounded-4 h-100 stat-card">
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="stat-label">Total Productos</p>
-                            <h2 class="stat-value">{{ total_products }}</h2>
-                            <p class="stat-sub">
-                                <span style="color: var(--color-success);">
-                                    <i class="bi bi-check-circle me-1"></i>{{ products_in_stock }} en stock
-                                </span>
-                            </p>
-                        </div>
-                        <div class="stat-icon" style="background-color: rgba(0,174,239,0.1); color: var(--color-accent);">
-                            <i class="bi bi-box-seam-fill"></i>
-                        </div>
+            <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <span class="text-muted small text-uppercase fw-bold">Productos</span>
+                        <h2 class="fw-bold text-dark my-2">{{ total_products }}</h2>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">
+                            <i class="bi bi-check-circle me-1"></i>{{ products_in_stock }} en stock
+                        </span>
+                    </div>
+                    <div class="p-3 rounded-4 bg-primary-subtle text-primary fs-3">
+                        <i class="bi bi-box-seam-fill"></i>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Customers -->
+        <!-- Total Orders -->
         <div class="col-6 col-lg-3">
-            <div class="card border-0 shadow-sm rounded-4 h-100 stat-card">
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="stat-label">Clientes</p>
-                            <h2 class="stat-value">{{ total_customers }}</h2>
-                            <p class="stat-sub" style="color: var(--color-muted);">registrados</p>
-                        </div>
-                        <div class="stat-icon" style="background-color: rgba(10,46,92,0.1); color: var(--color-primary);">
-                            <i class="bi bi-people-fill"></i>
-                        </div>
+            <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <span class="text-muted small text-uppercase fw-bold">Pedidos Web</span>
+                        <h2 class="fw-bold text-dark my-2">{{ total_orders }}</h2>
+                        <span class="text-muted small">recibidos por la web</span>
+                    </div>
+                    <div class="p-3 rounded-4 bg-info-subtle text-info-emphasis fs-3">
+                        <i class="bi bi-cart3"></i>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Monthly Sales Count -->
+        <!-- Pending Orders -->
         <div class="col-6 col-lg-3">
-            <div class="card border-0 shadow-sm rounded-4 h-100 stat-card">
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="stat-label">Ventas del Mes</p>
-                            <h2 class="stat-value">{{ total_sales_month }}</h2>
-                            <p class="stat-sub" style="color: var(--color-muted);">transacciones</p>
-                        </div>
-                        <div class="stat-icon" style="background-color: rgba(255,107,0,0.1); color: var(--color-accent-alt);">
-                            <i class="bi bi-cart-check-fill"></i>
-                        </div>
+            <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <span class="text-warning-emphasis small text-uppercase fw-bold">Pendientes</span>
+                        <h2 class="fw-bold text-warning-emphasis my-2">{{ pending_orders }}</h2>
+                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill">
+                            A la espera de confirmación
+                        </span>
+                    </div>
+                    <div class="p-3 rounded-4 bg-warning-subtle text-warning fs-3">
+                        <i class="bi bi-clock-history"></i>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Monthly Revenue -->
+        <!-- Confirmed Revenue -->
         <div class="col-6 col-lg-3">
-            <div class="card border-0 shadow-sm rounded-4 h-100 stat-card">
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="stat-label">Ingresos del Mes</p>
-                            <h2 class="stat-value" style="font-size: 1.4rem;">USD ${{ total_revenue_usd|fmt(0) }}</h2>
-                            <p class="stat-sub" style="color: var(--color-muted);">
-                                ARS ${{ total_revenue_ars|fmt(0) }}
-                            </p>
-                        </div>
-                        <div class="stat-icon" style="background-color: rgba(22,163,74,0.1); color: var(--color-success);">
-                            <i class="bi bi-graph-up-arrow"></i>
-                        </div>
+            <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <span class="text-muted small text-uppercase fw-bold">Total Facturado</span>
+                        <h2 class="fw-bold text-success my-2 fs-3">${{ total_revenue_ars|fmt }}</h2>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">
+                            {{ confirmed_orders }} confirmados
+                        </span>
+                    </div>
+                    <div class="p-3 rounded-4 bg-success-subtle text-success fs-3">
+                        <i class="bi bi-cash-stack"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row g-4">
-        <!-- Recent Sales -->
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-header border-0 bg-white rounded-top-4 py-3 px-4 d-flex justify-content-between align-items-center">
-                    <h6 class="fw-semibold mb-0" style="color: var(--color-text);">
-                        <i class="bi bi-clock-history me-2" style="color: var(--color-accent);"></i>
-                        Ventas Recientes
-                    </h6>
-                    <a href="{{ url_for('sales.list_sales') }}" class="btn btn-sm" style="color: var(--color-accent);">
-                        Ver todas <i class="bi bi-arrow-right ms-1"></i>
-                    </a>
-                </div>
-                <div class="card-body p-0">
-                    {% if recent_sales %}
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0 align-middle">
-                            <thead style="background-color: var(--color-surface);">
-                                <tr>
-                                    <th class="px-4 py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Fecha</th>
-                                    <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Producto</th>
-                                    <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Cliente</th>
-                                    <th class="py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Venta USD</th>
-                                    <th class="pe-4 py-3 fw-medium" style="color: var(--color-muted); font-size: 0.8rem; text-transform: uppercase;">Ganancia</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for sale in recent_sales %}
-                                <tr>
-                                    <td class="px-4 py-3 small" style="color: var(--color-muted);">
-                                        {{ sale.created_at.strftime('%d/%m/%Y') }}
-                                    </td>
-                                    <td class="py-3">
-                                        <span class="fw-medium small" style="color: var(--color-text);">
-                                            {{ sale.product.name if sale.product else 'N/A' }}
-                                        </span>
-                                    </td>
-                                    <td class="py-3 small" style="color: var(--color-muted);">
-                                        {{ sale.customer.name if sale.customer else 'Sin cliente' }}
-                                    </td>
-                                    <td class="py-3 fw-semibold" style="color: var(--color-accent-alt);">
-                                        USD ${{ sale.sale_price_usd|fmt }}
-                                    </td>
-                                    <td class="pe-4 py-3 fw-semibold" style="color: var(--color-success);">
-                                        USD ${{ sale.profit_usd|fmt }}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+    <!-- Pedidos Recientes -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+        <div class="card-header border-0 bg-white rounded-top-4 py-3 px-4 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold mb-0 text-dark">
+                <i class="bi bi-inbox-fill text-primary me-2"></i>
+                Últimos Pedidos Recibidos
+            </h5>
+            <a href="{{ url_for('orders.list_orders') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                Ver todos los pedidos <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">N° Pedido</th>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Teléfono</th>
+                        <th>Dirección</th>
+                        <th class="text-end">Total ($)</th>
+                        <th class="text-center">Estado</th>
+                        <th class="pe-4 text-end">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in recent_orders %}
+                    <tr>
+                        <td class="ps-4 fw-bold text-primary">{{ order.order_number }}</td>
+                        <td class="small text-muted">{{ order.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td class="fw-semibold text-dark">{{ order.customer_name }}</td>
+                        <td class="small">{{ order.customer_phone }}</td>
+                        <td class="small text-muted text-truncate" style="max-width: 200px;">{{ order.customer_address }}</td>
+                        <td class="text-end fw-bold text-success">${{ order.total_amount|fmt }}</td>
+                        <td class="text-center">
+                            {% if order.status == 'pendiente' %}
+                            <span class="badge bg-warning text-dark rounded-pill">Pendiente</span>
+                            {% elif order.status == 'confirmado' %}
+                            <span class="badge bg-primary rounded-pill">Confirmado</span>
+                            {% elif order.status == 'en_camino' %}
+                            <span class="badge bg-info text-dark rounded-pill">En camino</span>
+                            {% elif order.status == 'entregado' %}
+                            <span class="badge bg-success rounded-pill">Entregado</span>
+                            {% elif order.status == 'cancelado' %}
+                            <span class="badge bg-danger rounded-pill">Cancelado</span>
+                            {% endif %}
+                        </td>
+                        <td class="pe-4 text-end">
+                            <a href="{{ url_for('orders.view_order', order_id=order.id) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                Ver
+                            </a>
+                        </td>
+                    </tr>
                     {% else %}
-                    <div class="text-center py-5">
-                        <i class="bi bi-cart-x" style="font-size: 2.5rem; color: var(--color-border);"></i>
-                        <p class="mt-2 mb-0" style="color: var(--color-muted);">No hay ventas registradas aún</p>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Quick Actions + Exchange Rate -->
-        <div class="col-lg-4">
-            <!-- Exchange Rate Card -->
-            <div class="card border-0 shadow-sm rounded-4 mb-4">
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="fw-semibold mb-0" style="color: var(--color-text);">
-                            <i class="bi bi-currency-exchange me-2" style="color: var(--color-accent);"></i>
-                            Tipo de Cambio
-                        </h6>
-                        <a href="{{ url_for('config_bp.config') }}" class="btn btn-sm" style="color: var(--color-accent); font-size: 0.75rem;">
-                            Actualizar
-                        </a>
-                    </div>
-                    <div class="text-center py-2">
-                        <div class="fw-bold" style="font-size: 1.8rem; color: var(--color-primary);">
-                            ${{ exchange_rate|fmt(0) }}
-                        </div>
-                        <div class="small" style="color: var(--color-muted);">ARS por 1 USD</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Profit Card -->
-            <div class="card border-0 shadow-sm rounded-4 mb-4">
-                <div class="card-body p-4">
-                    <h6 class="fw-semibold mb-3" style="color: var(--color-text);">
-                        <i class="bi bi-graph-up me-2" style="color: var(--color-success);"></i>
-                        Ganancia del Mes
-                    </h6>
-                    <div class="mb-2">
-                        <span class="small" style="color: var(--color-muted);">En USD</span>
-                        <div class="fw-bold" style="color: var(--color-success); font-size: 1.3rem;">
-                            USD ${{ total_profit_usd|fmt }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-body p-4">
-                    <h6 class="fw-semibold mb-3" style="color: var(--color-text);">
-                        <i class="bi bi-lightning-charge me-2" style="color: var(--color-accent-alt);"></i>
-                        Acciones Rápidas
-                    </h6>
-                    <div class="d-grid gap-2">
-                        <a href="{{ url_for('products.new_product') }}" class="btn btn-sm text-white fw-medium" style="background-color: var(--color-accent);">
-                            <i class="bi bi-plus-circle me-2"></i>Agregar Producto
-                        </a>
-                        <a href="{{ url_for('sales.new_sale') }}" class="btn btn-sm text-white fw-medium" style="background-color: var(--color-success);">
-                            <i class="bi bi-cart-plus me-2"></i>Registrar Venta
-                        </a>
-                        <a href="{{ url_for('sales.simulator') }}" class="btn btn-sm text-white fw-medium" style="background-color: var(--color-accent-alt);">
-                            <i class="bi bi-calculator me-2"></i>Simulador de Precios
-                        </a>
-                        <a href="{{ url_for('config_bp.config') }}" class="btn btn-sm fw-medium" style="background-color: var(--color-surface); color: var(--color-primary); border: 1px solid var(--color-border);">
-                            <i class="bi bi-gear me-2"></i>Configurar Cambio
-                        </a>
-                    </div>
-                </div>
-            </div>
+                    <tr>
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox fs-1 d-block mb-2 text-muted"></i>
+                            Aún no se han recibido pedidos web.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
+
 </div>
 {% endblock %}

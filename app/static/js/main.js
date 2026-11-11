@@ -108,13 +108,15 @@ function initCatalogFilters() {
    ---------------------------------------------------------- */
 
 function openProductModal(productId) {
-  const modal = new bootstrap.Modal(document.getElementById('productModal'));
+  const modalEl = document.getElementById('productModal');
+  if (!modalEl) return;
+  const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
   const modalBody = document.getElementById('modalBody');
 
   // Show spinner
   modalBody.innerHTML = `
     <div class="text-center p-5">
-      <div class="spinner-border" style="color: var(--color-accent);" role="status">
+      <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Cargando...</span>
       </div>
     </div>`;
@@ -125,78 +127,76 @@ function openProductModal(productId) {
     .then(res => res.json())
     .then(data => {
       const stockBadge = data.stock
-        ? `<span class="badge rounded-pill" style="background-color: rgba(22,163,74,0.1); color: var(--color-success);">
+        ? `<span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-3 py-2">
              <i class="bi bi-check-circle me-1"></i>Disponible
            </span>`
-        : `<span class="badge rounded-pill" style="background-color: rgba(220,38,38,0.1); color: var(--color-danger);">
+        : `<span class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle px-3 py-2">
              <i class="bi bi-x-circle me-1"></i>Sin stock
            </span>`;
 
       const badgeHtml = data.badge ? (() => {
         const badges = {
-          'mas-vendido': '<span class="badge badge-hot rounded-pill"><i class="bi bi-fire me-1"></i>Más vendido</span>',
-          'nuevo': '<span class="badge badge-new rounded-pill"><i class="bi bi-stars me-1"></i>Nuevo</span>',
-          'oferta': '<span class="badge badge-offer rounded-pill"><i class="bi bi-tag me-1"></i>Oferta</span>'
+          'mas-vendido': '<span class="badge bg-warning text-dark rounded-pill px-2 py-1"><i class="bi bi-fire me-1"></i>Más vendido</span>',
+          'nuevo': '<span class="badge bg-info text-dark rounded-pill px-2 py-1"><i class="bi bi-stars me-1"></i>Nuevo</span>',
+          'oferta': '<span class="badge bg-danger rounded-pill px-2 py-1"><i class="bi bi-tag me-1"></i>Oferta</span>'
         };
         return badges[data.badge] || '';
       })() : '';
 
       const imgHtml = data.image_filename
-        ? `<img src="/static/uploads/${data.image_filename}" alt="${data.name}" class="img-fluid rounded-3" style="max-height: 280px; object-fit: contain; width: 100%;">`
-        : `<div class="d-flex align-items-center justify-content-center rounded-3" style="height: 200px; background-color: var(--color-surface);">
-             <i class="bi bi-image" style="font-size: 4rem; color: var(--color-border);"></i>
+        ? `<img src="/static/uploads/${data.image_filename}" alt="${data.name}" class="img-fluid rounded-4 border" style="max-height: 280px; object-fit: contain; width: 100%;">`
+        : `<div class="d-flex align-items-center justify-content-center rounded-4 bg-light border" style="height: 220px;">
+             <i class="bi bi-droplet-half text-primary" style="font-size: 4rem;"></i>
            </div>`;
 
-      const exchangeRate = typeof EXCHANGE_RATE !== 'undefined' ? EXCHANGE_RATE : data.exchange_rate;
-      const arsPrice = (data.sale_price_usd * exchangeRate).toLocaleString('es-AR', {maximumFractionDigits: 0});
+      const priceFormatted = Number(data.price_ars).toLocaleString('es-AR');
+
+      const actionBtn = data.stock
+        ? `<button class="btn btn-primary rounded-pill w-100 py-3 fw-bold fs-6 shadow-sm"
+                   onclick="addToCart({id: ${data.id}, name: '${data.name.replace(/'/g, "\\'")}', presentation: '${(data.presentation || 'Bidón 5 Litros').replace(/'/g, "\\'")}', price: ${data.price_ars}, image: '${data.image_filename || ''}'}); bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();">
+             <i class="bi bi-cart-plus me-2 fs-5"></i>Agregar al Pedido
+           </button>`
+        : `<button class="btn btn-secondary rounded-pill w-100 py-3 fw-bold" disabled>
+             <i class="bi bi-x-circle me-2"></i>Sin Stock Por el Momento
+           </button>`;
 
       modalBody.innerHTML = `
         <div class="row g-0">
-          <div class="col-md-5 p-4" style="background-color: var(--color-surface);">
+          <div class="col-md-5 p-4 bg-light d-flex flex-column align-items-center justify-content-center text-center">
             ${imgHtml}
-            <div class="text-center mt-3">
-              <span class="badge rounded-pill me-1" style="background-color: rgba(0,174,239,0.15); color: var(--color-accent);">
+            <div class="mt-3 d-flex gap-2 flex-wrap justify-content-center">
+              <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill">
                 ${data.category}
               </span>
               ${badgeHtml}
             </div>
           </div>
           <div class="col-md-7 p-4">
-            <h4 class="fw-bold mb-1" style="color: var(--color-text);">${data.name}</h4>
-            <p class="mb-3" style="color: var(--color-muted);">${data.brand}${data.model ? ' · ' + data.model : ''}</p>
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <span class="badge bg-light text-dark border px-3 py-1 fw-bold">${data.presentation || 'Bidón 5 Litros'}</span>
+              ${stockBadge}
+            </div>
 
-            ${data.description ? `<p class="mb-3 small" style="color: var(--color-text);">${data.description}</p>` : ''}
+            <h3 class="fw-bold text-dark mb-2">${data.name}</h3>
 
-            ${(data.ram || data.storage || data.color) ? `
-            <div class="d-flex flex-wrap gap-2 mb-3">
-              ${data.ram ? `<span class="badge rounded-pill px-3 py-2" style="background-color: rgba(10,46,92,0.08); color: var(--color-primary); font-size: 0.8rem;"><i class="bi bi-memory me-1"></i><strong>RAM:</strong> ${data.ram}</span>` : ''}
-              ${data.storage ? `<span class="badge rounded-pill px-3 py-2" style="background-color: rgba(10,46,92,0.08); color: var(--color-primary); font-size: 0.8rem;"><i class="bi bi-device-hdd me-1"></i><strong>Almacenamiento:</strong> ${data.storage}</span>` : ''}
-              ${data.color ? `<span class="badge rounded-pill px-3 py-2" style="background-color: rgba(10,46,92,0.08); color: var(--color-primary); font-size: 0.8rem;"><i class="bi bi-palette me-1"></i><strong>Color:</strong> ${data.color}</span>` : ''}
-            </div>` : ''}
+            ${data.description ? `<p class="text-muted small mb-3">${data.description}</p>` : ''}
 
-            <div class="mb-3">
-              <div class="fw-bold mb-1" style="color: var(--color-accent-alt); font-size: 1.6rem;">
-                USD $${parseFloat(data.sale_price_usd).toLocaleString('es-AR', {minimumFractionDigits: 2})}
-              </div>
-              <div style="color: var(--color-muted);">
-                ARS $${arsPrice}
+            <div class="mb-4 p-3 bg-light rounded-4 border">
+              <span class="text-muted small fw-bold text-uppercase d-block mb-1">Precio Directo de Fábrica</span>
+              <div class="fw-bold text-success fs-2">
+                $${priceFormatted}
               </div>
             </div>
 
-            <div class="mb-4">${stockBadge}</div>
-
-            <div class="p-3 rounded-3 small" style="background-color: var(--color-surface); color: var(--color-muted);">
-              <i class="bi bi-currency-exchange me-1"></i>
-              Precio en ARS calculado con USD 1 = ARS $${parseFloat(exchangeRate).toLocaleString('es-AR', {maximumFractionDigits: 0})}
-            </div>
+            ${actionBtn}
           </div>
         </div>`;
     })
     .catch(err => {
       modalBody.innerHTML = `
         <div class="text-center p-5">
-          <i class="bi bi-exclamation-triangle" style="font-size: 2rem; color: var(--color-danger);"></i>
-          <p class="mt-2" style="color: var(--color-muted);">Error al cargar el producto</p>
+          <i class="bi bi-exclamation-triangle text-danger fs-1"></i>
+          <p class="mt-2 text-muted">Error al cargar la información del producto.</p>
         </div>`;
     });
 }

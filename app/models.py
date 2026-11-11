@@ -67,50 +67,86 @@ class Product(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
-    brand = db.Column(db.String(100), nullable=False, default='')
-    model = db.Column(db.String(100), nullable=False, default='')
+    brand = db.Column(db.String(100), nullable=True, default='Mundolimp')
+    model = db.Column(db.String(100), nullable=True, default='')
     description = db.Column(db.Text, nullable=True)
-    category = db.Column(db.String(100), nullable=False, default='Accesorios')
-    cost_price_usd = db.Column(db.Numeric(10, 2), nullable=False, default=0)
-    sale_price_usd = db.Column(db.Numeric(10, 2), nullable=False, default=0)
+    category = db.Column(db.String(100), nullable=False, default='Lavandinas y Cloro')
+    price = db.Column(db.Numeric(12, 2), nullable=True, default=0)  # Precio directo en ARS
+    presentation = db.Column(db.String(100), nullable=False, default='Bidón 5 Litros')
+    cost_price_usd = db.Column(db.Numeric(10, 2), nullable=True, default=0)
+    sale_price_usd = db.Column(db.Numeric(10, 2), nullable=True, default=0)
     image_filename = db.Column(db.String(255), nullable=True)
     ram = db.Column(db.String(50), nullable=True)
     storage = db.Column(db.String(50), nullable=True)
     color = db.Column(db.String(50), nullable=True)
     stock = db.Column(db.Boolean, default=True, nullable=False)
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
     mercadolibre_active = db.Column(db.Boolean, default=False, nullable=False)
-    badge = db.Column(db.String(50), nullable=True)
+    badge = db.Column(db.String(50), nullable=True)  # mas-vendido, oferta, nuevo
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     sales = db.relationship('Sale', backref='product', lazy=True)
 
-    def sale_price_ars(self, exchange_rate):
-        try:
-            rate = Decimal(str(exchange_rate))
-            return Decimal(str(self.sale_price_usd)) * rate
-        except Exception:
-            return Decimal('0')
+    @property
+    def price_ars(self):
+        """Retorna el precio en ARS del producto"""
+        if self.price is not None and float(self.price) > 0:
+            return Decimal(str(self.price))
+        if self.sale_price_usd is not None and float(self.sale_price_usd) > 0:
+            return Decimal(str(self.sale_price_usd))
+        return Decimal('0')
+
+    def sale_price_ars(self, exchange_rate=1):
+        return self.price_ars
 
     @property
     def profit_usd(self):
-        try:
-            return Decimal(str(self.sale_price_usd)) - Decimal(str(self.cost_price_usd))
-        except Exception:
-            return Decimal('0')
+        return Decimal('0')
 
     @property
     def profit_margin_percent(self):
-        try:
-            cost = Decimal(str(self.cost_price_usd))
-            if cost == 0:
-                return Decimal('0')
-            return (self.profit_usd / cost) * Decimal('100')
-        except Exception:
-            return Decimal('0')
+        return Decimal('0')
 
     def __repr__(self):
         return f'<Product {self.name}>'
+
+
+class Order(db.Model):
+    __tablename__ = 'orders'
+
+    id = db.Column(db.Integer, primary_key=True)
+    order_number = db.Column(db.String(50), unique=True, nullable=False, index=True)
+    customer_name = db.Column(db.String(200), nullable=False)
+    customer_phone = db.Column(db.String(100), nullable=False)
+    customer_address = db.Column(db.String(255), nullable=False)
+    customer_city = db.Column(db.String(100), nullable=True)
+    notes = db.Column(db.Text, nullable=True)
+    total_amount = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    status = db.Column(db.String(50), default='pendiente', nullable=False, index=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    items = db.relationship('OrderItem', backref='order', lazy=True, cascade='all, delete-orphan')
+
+    def __repr__(self):
+        return f'<Order {self.order_number} - {self.customer_name}>'
+
+
+class OrderItem(db.Model):
+    __tablename__ = 'order_items'
+
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.id', ondelete='CASCADE'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id', ondelete='SET NULL'), nullable=True)
+    product_name = db.Column(db.String(200), nullable=False)
+    presentation = db.Column(db.String(100), nullable=True)
+    quantity = db.Column(db.Numeric(10, 2), nullable=False, default=1)
+    unit_price = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+    subtotal = db.Column(db.Numeric(12, 2), nullable=False, default=0)
+
+    def __repr__(self):
+        return f'<OrderItem {self.product_name} x {self.quantity}>'
+
 
 
 class Customer(db.Model):
